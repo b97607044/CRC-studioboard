@@ -68,8 +68,8 @@ body {
 .header-sub { font-size: 12px; font-weight: 500; color: var(--ink-light); margin-top: 4px; }
 
 /* ── THREE-COLUMN LAYOUT ── */
-.three-col { display: grid; grid-template-columns: 180px 1fr 280px; min-height: calc(100vh - 120px); position: relative; z-index: 2; transition: grid-template-columns 0.25s ease; }
-.three-col.left-collapsed { grid-template-columns: 36px 1fr 280px; }
+.three-col { display: grid; grid-template-columns: 180px minmax(0,1fr) minmax(0,1fr); min-height: calc(100vh - 120px); position: relative; z-index: 2; transition: grid-template-columns 0.25s ease; }
+.three-col.left-collapsed { grid-template-columns: 36px minmax(0,1fr) minmax(0,1fr); }
 .three-col.right-collapsed { grid-template-columns: 180px 1fr 36px; }
 .three-col.left-collapsed.right-collapsed { grid-template-columns: 36px 1fr 36px; }
 .col-divider { border-right: 1px solid var(--border-soft); }
@@ -91,13 +91,13 @@ body {
 }
 .right-col-toggle {
   position: absolute;
-  right: 280px; /* width of right col */
+  left: -14px;
   top: 20px;
   z-index: 20;
-  transform: translateX(50%); /* center on the boundary */
+  transform: none;
 }
 .right-collapsed .right-col-toggle {
-  right: 36px; /* width when collapsed */
+  left: -14px;
 }
 .nav-home-btn {
   font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700;
@@ -269,7 +269,7 @@ textarea.core-q-input::placeholder { color: rgba(255,255,255,0.35); }
 
 /* Submit form (2b page) */
 .submit-page { display: none; }
-.submit-page.active { display: grid; grid-template-columns: 1fr 280px; min-height: calc(100vh - 80px); }
+.submit-page.active { display: grid; grid-template-columns: 1fr minmax(0,1fr); min-height: calc(100vh - 80px); }
 .submit-main { padding: 24px 28px; overflow-y: auto; }
 .submit-top-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
 .submit-back-btn { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: var(--ink-light); background: var(--card-bg); border: 2px solid transparent; border-radius: 20px; padding: 7px 14px; cursor: pointer; transition: all 0.13s; }
@@ -559,8 +559,6 @@ textarea:focus, input[type="text"]:focus { border-color: var(--orange); backgrou
 
   <!-- MAIN: three-col (left sidebar | mid content | right wall) -->
   <div class="three-col" id="mainThreeCol">
-    <!-- Right-col toggle: floats at the boundary, always visible -->
-    <button class="col-toggle-btn right-col-toggle" onclick="toggleRightCol()" id="rightToggleBtn" title="收合回應欄">›</button>
 
     <!-- LEFT SIDEBAR -->
     <nav class="left-col col-divider" id="leftSidebar">
@@ -582,9 +580,9 @@ textarea:focus, input[type="text"]:focus { border-color: var(--orange); backgrou
           <div class="home-section-title">Material 材料許願池</div>
           <div class="book-list" id="bookListOverall"><div class="empty-state">許願池還空著</div></div>
           <div class="add-row" style="margin-bottom:24px;">
-            <div class="field-group" style="flex:2;min-width:110px;"><div class="field-label">Title 標題</div><input type="text" id="bookTitleOverall" placeholder="書名、文章、影片..."></div>
-            <div class="field-group" style="flex:2;min-width:110px;"><div class="field-label">Description 簡短說明</div><input type="text" id="bookTypeOverall" placeholder="推薦原因..."></div>
-            <div class="field-group" style="flex:1;min-width:65px;"><div class="field-label">By 推薦人</div><input type="text" id="bookWhoOverall" placeholder="名字"></div>
+            <div class="field-group" style="flex:2;min-width:110px;"><div class="field-label">Title 標題</div><input type="text" id="bookTitleOverall" placeholder=""></div>
+            <div class="field-group" style="flex:2;min-width:110px;"><div class="field-label">Description 簡短說明</div><input type="text" id="bookTypeOverall" placeholder=""></div>
+            <div class="field-group" style="flex:1;min-width:65px;"><div class="field-label">By 推薦人</div><input type="text" id="bookWhoOverall" placeholder=""></div>
             <div class="field-group" style="flex:2;min-width:130px;"><div class="field-label">Link 連結</div><input type="text" id="bookLinkOverall" placeholder="https://..."></div>
             <div class="field-group" style="min-width:130px;"><div class="field-label">Image 上傳圖片</div><label class="file-upload-btn" for="bookImgOverall"><span id="bookImgOverallLabel">選擇圖片</span></label><input type="file" id="bookImgOverall" accept="image/*" style="display:none;" onchange="updateFileLabel(this,'bookImgOverallLabel')"></div>
             <button class="btn btn-sm" onclick="addBookOverall()">+ 加入</button>
@@ -603,6 +601,7 @@ textarea:focus, input[type="text"]:focus { border-color: var(--orange); backgrou
 
     <!-- RIGHT COLUMN: wall -->
     <div class="right-col">
+      <button class="col-toggle-btn right-col-toggle" onclick="toggleRightCol()" id="rightToggleBtn" title="收合回應欄">›</button>
       <div class="right-col-label-wrap" style="padding:14px 18px 0;">
         <div class="right-col-section-label" id="wallColLabel">Response 回應＆參考</div>
       </div>
@@ -1109,6 +1108,11 @@ function renderCardList(mid){
       </div>
       <div class="card-detail">
         <div class="card-detail-tabs-bar">
+          ${c.editing ? `
+            <div style="flex:1;padding:6px 10px;font-size:12px;font-weight:600;color:var(--orange);">✎ 編輯中</div>
+            <button class="btn btn-green btn-sm" style="margin:6px 4px;" onclick="saveCardEdit('${mid}','${cid}')">✓ 儲存</button>
+            <button class="btn btn-ghost btn-sm" style="margin:6px 4px;" onclick="cancelCardEdit('${mid}','${cid}')">取消</button>
+          ` : `
           <button class="detail-tab tab-summary${c.openSummary?' open':''}" onclick="toggleDetailTab('${mid}','${cid}','Summary')">
             <span class="detail-tab-label">SUMMARY</span><span class="detail-tab-chevron${c.openSummary?' open':''}">▾</span>
           </button>
@@ -1119,10 +1123,44 @@ function renderCardList(mid){
             <span class="detail-tab-label">OPEN NOTE</span><span class="detail-tab-chevron${c.openReference?' open':''}">▾</span>
           </button>
           <div style="flex:1;"></div>
-          <button class="btn btn-ghost btn-sm" style="margin:6px 8px;" onclick="deleteCard('${mid}','${cid}')">刪除</button>
+          <button class="btn btn-ghost btn-sm" style="margin:6px 4px;" onclick="startCardEdit('${mid}','${cid}')">✎ 編輯</button>
+          <button class="btn btn-ghost btn-sm" style="margin:6px 4px;color:#FF6B5B;" onclick="deleteCard('${mid}','${cid}')">刪除</button>
+          `}
         </div>
+        ${c.editing ? `
+        <div style="padding:16px 18px;background:var(--card-bg);">
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+            <div style="flex:3;min-width:120px;display:flex;flex-direction:column;gap:4px;">
+              <div class="d-label">材料標題</div>
+              <input type="text" id="ce_title_${cid}" value="${c.title.replace(/"/g,'&quot;')}" style="font-size:14px;font-weight:700;">
+            </div>
+            <div style="flex:1;min-width:80px;display:flex;flex-direction:column;gap:4px;">
+              <div class="d-label">填寫人</div>
+              <input type="text" id="ce_author_${cid}" value="${c.author.replace(/"/g,'&quot;')}">
+            </div>
+          </div>
+          <div class="d-label" style="margin-bottom:4px;color:#6B3FD4;">SUMMARY</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+            <div><div class="d-label" style="font-size:9px;">這份材料在說什麼？</div><textarea id="ce_sum1_${cid}" rows="3" style="border:2px solid #D9CCFA;">${c.sum1}</textarea></div>
+            <div><div class="d-label" style="font-size:9px;">與研究主題的關係？</div><textarea id="ce_sum2_${cid}" rows="3" style="border:2px solid #D9CCFA;">${c.sum2}</textarea></div>
+          </div>
+          <div class="d-label" style="margin-bottom:4px;color:#1B8A50;">SPECULATION</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+            <div><div class="d-label" style="font-size:9px;">轉化成什麼裝置／場景？</div><textarea id="ce_imag1_${cid}" rows="3" style="border:2px solid #B6E8CC;">${c.imag1}</textarea></div>
+            <div><div class="d-label" style="font-size:9px;">誰在使用？誰被排除？</div><textarea id="ce_imag2_${cid}" rows="3" style="border:2px solid #B6E8CC;">${c.imag2}</textarea></div>
+            <div><div class="d-label" style="font-size:9px;">需要什麼材料、測試？</div><textarea id="ce_imag3_${cid}" rows="3" style="border:2px solid #B6E8CC;">${c.imag3}</textarea></div>
+            <div><div class="d-label" style="font-size:9px;">倫理風險？</div><textarea id="ce_imag4_${cid}" rows="3" style="border:2px solid #B6E8CC;">${c.imag4}</textarea></div>
+          </div>
+          <div class="d-label" style="margin-bottom:4px;color:#C2790E;">OPEN NOTE</div>
+          <textarea id="ce_note_${cid}" rows="3" style="border:2px solid #FBE0AD;margin-bottom:10px;">${c.openNote}</textarea>
+          <div class="d-label" style="margin-bottom:4px;">Link 連結</div>
+          <input type="text" id="ce_refUrl_${cid}" value="${c.refUrl.replace(/"/g,'&quot;')}" style="margin-bottom:10px;">
+          <div class="d-label" style="margin-bottom:4px;">Keywords 關鍵字（逗號分隔）</div>
+          <input type="text" id="ce_kw_${cid}" value="${c.keywords.join(', ').replace(/"/g,'&quot;')}">
+        </div>
+        ` : `
         <div class="detail-section ds-summary${c.openSummary?' open':''}">
-          <div class="d-grid">
+          <div style="display:flex;flex-direction:column;gap:10px;">
             <div><div class="d-label">這份材料在說什麼？</div><div class="d-val markdown-body${c.sum1?'':' empty'}">${c.sum1?renderMd(c.sum1):'尚未填寫'}</div></div>
             <div><div class="d-label">與研究主題的關係？</div><div class="d-val markdown-body${c.sum2?'':' empty'}">${c.sum2?renderMd(c.sum2):'尚未填寫'}</div></div>
           </div>
@@ -1140,9 +1178,47 @@ function renderCardList(mid){
           ${c.refUrl?`<a href="${c.refUrl}" target="_blank" style="font-size:12px;color:var(--orange);font-weight:600;margin-bottom:8px;display:block;">🔗 ${c.refUrl.length>50?c.refUrl.slice(0,50)+'…':c.refUrl}</a>`:''}
           ${c.openNote?`<div class="d-val markdown-body">${renderMd(c.openNote)}</div>`:`<div class="d-val empty">尚未填寫</div>`}
         </div>
+        `}
       </div>
     </div>`;
   }).join('');
+}
+function startCardEdit(mid,id){
+  const c=data[mid]?.cards.find(c=>c.fbKey===id||c.id===id); if(!c) return;
+  c.editing=true; c.expanded=true;
+  renderCardList(mid);
+}
+function cancelCardEdit(mid,id){
+  const c=data[mid]?.cards.find(c=>c.fbKey===id||c.id===id); if(!c) return;
+  c.editing=false;
+  renderCardList(mid);
+}
+async function saveCardEdit(mid,id){
+  const c=data[mid]?.cards.find(c=>c.fbKey===id||c.id===id); if(!c) return;
+  const fbKey=c.fbKey||c.id;
+  c.title=document.getElementById(`ce_title_${id}`)?.value.trim()||c.title;
+  c.author=document.getElementById(`ce_author_${id}`)?.value.trim()||c.author;
+  c.sum1=document.getElementById(`ce_sum1_${id}`)?.value.trim()||'';
+  c.sum2=document.getElementById(`ce_sum2_${id}`)?.value.trim()||'';
+  c.imag1=document.getElementById(`ce_imag1_${id}`)?.value.trim()||'';
+  c.imag2=document.getElementById(`ce_imag2_${id}`)?.value.trim()||'';
+  c.imag3=document.getElementById(`ce_imag3_${id}`)?.value.trim()||'';
+  c.imag4=document.getElementById(`ce_imag4_${id}`)?.value.trim()||'';
+  c.openNote=document.getElementById(`ce_note_${id}`)?.value.trim()||'';
+  c.refUrl=document.getElementById(`ce_refUrl_${id}`)?.value.trim()||'';
+  c.keywords=document.getElementById(`ce_kw_${id}`)?.value.split(',').map(k=>k.trim()).filter(Boolean)||[];
+  c.editedAt=new Date().toLocaleDateString('zh-TW');
+  c.editing=false;
+  renderCardList(mid);
+  toast('✓ 卡片已更新');
+  try{
+    await fbSet(`cards/${fbKey}`,{
+      month:mid, title:c.title, author:c.author, date:c.date, time:c.time, editedAt:c.editedAt,
+      sum1:c.sum1, sum2:c.sum2, imag1:c.imag1, imag2:c.imag2, imag3:c.imag3, imag4:c.imag4,
+      openNote:c.openNote, refUrl:c.refUrl, refImg:JSON.stringify(c.refImgs||[]),
+      keywords:c.keywords.join(','), type:c.type||''
+    });
+  }catch(e){ toastError('⚠️ 儲存失敗'); }
 }
 function toggleCardExpand(mid,id){
   const c=data[mid]?.cards.find(c=>c.fbKey===id||c.id===id); if(!c) return;
@@ -1261,9 +1337,19 @@ function renderWallCol(){
     const el=document.getElementById('wallColList'); if(!el) return;
     if(!items.length){el.innerHTML='<div class="empty-state">牆上還空著</div>';return;}
     el.innerHTML=items.map(w=>{
-      if(w.type==='q') return `<div class="wall-col-item type-q"><div class="wall-col-body"><span class="wall-col-type type-q">提問</span><div class="wall-col-text">${renderMd(w.text)}</div><div class="wall-col-who">✦ ${w.who}</div></div><button class="wall-col-del" onclick="removeWallItem(${w.id})">×</button></div>`;
+      const wid=w.fbKey||w.id;
+      if(w.editing){
+        return `<div class="wall-col-item type-q" style="padding:10px;">
+          <textarea id="we_text_${wid}" rows="3" style="margin-bottom:6px;">${w.text||w.title||''}</textarea>
+          <div style="display:flex;gap:5px;">
+            <button class="btn btn-green btn-sm" style="font-size:11px;padding:4px 10px;" onclick="saveWallEdit('${wid}')">✓ 儲存</button>
+            <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 10px;" onclick="cancelWallEdit('${wid}')">取消</button>
+          </div>
+        </div>`;
+      }
+      if(w.type==='q') return `<div class="wall-col-item type-q"><div class="wall-col-body"><span class="wall-col-type type-q">提問</span><div class="wall-col-text">${renderMd(w.text)}</div><div class="wall-col-who">✦ ${w.who}</div></div><div style="position:absolute;top:5px;right:5px;display:flex;gap:3px;"><button onclick="startWallEdit('${wid}')" style="background:white;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;color:var(--ink-light);display:flex;align-items:center;justify-content:center;">✎</button><button class="wall-col-del" style="position:static;" onclick="removeWallItem('${wid}')">×</button></div></div>`;
       const thumbHtml=w.imgSrc?`<img class="wall-col-thumb" src="${w.imgSrc}" alt="${w.title}">`:w.url?`<div class="wall-col-placeholder">🔗</div>`:'';
-      return `<div class="wall-col-item type-link">${thumbHtml}<div class="wall-col-body"><span class="wall-col-type type-link">參考</span><div class="wall-col-title">${w.title}</div>${w.desc?`<div class="wall-col-desc">${w.desc}</div>`:''}${w.url?`<a href="${w.url}" target="_blank" class="wall-col-url">${w.url.length>30?w.url.slice(0,30)+'…':w.url}</a>`:''}<div class="wall-col-who">✦ ${w.who}</div></div><button class="wall-col-del" onclick="removeWallItem(${w.id})">×</button></div>`;
+      return `<div class="wall-col-item type-link">${thumbHtml}<div class="wall-col-body"><span class="wall-col-type type-link">參考</span><div class="wall-col-title">${w.title}</div>${w.desc?`<div class="wall-col-desc">${w.desc}</div>`:''}${w.url?`<a href="${w.url}" target="_blank" class="wall-col-url">${w.url.length>30?w.url.slice(0,30)+'…':w.url}</a>`:''}<div class="wall-col-who">✦ ${w.who}</div></div><div style="position:absolute;top:5px;right:5px;display:flex;gap:3px;"><button onclick="startWallEdit('${wid}')" style="background:white;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;color:var(--ink-light);display:flex;align-items:center;justify-content:center;">✎</button><button class="wall-col-del" style="position:static;" onclick="removeWallItem('${wid}')">×</button></div></div>`;
     }).join('');
   }
 }
@@ -1373,6 +1459,26 @@ async function addWallRef(){
   if(file){const reader=new FileReader();reader.onload=e=>finish(e.target.result);reader.readAsDataURL(file);} else finish('');
 }
 
+function startWallEdit(wid){
+  if(!activeMonth) return;
+  const w=data[activeMonth].wall.find(w=>(w.fbKey||w.id)===wid); if(!w) return;
+  w.editing=true; renderWallCol();
+}
+function cancelWallEdit(wid){
+  if(!activeMonth) return;
+  const w=data[activeMonth].wall.find(w=>(w.fbKey||w.id)===wid); if(!w) return;
+  w.editing=false; renderWallCol();
+}
+async function saveWallEdit(wid){
+  if(!activeMonth) return;
+  const w=data[activeMonth].wall.find(w=>(w.fbKey||w.id)===wid); if(!w) return;
+  const newText=document.getElementById(`we_text_${wid}`)?.value.trim()||'';
+  if(w.type==='q') w.text=newText; else w.title=newText;
+  w.editing=false;
+  renderWallCol(); toast('✓ 已更新');
+  try{ await fbSet(`wall/${wid}`,{month:activeMonth,type:w.type,who:w.who,text:w.text||'',title:w.title||'',desc:w.desc||'',url:w.url||'',imgSrc:w.imgSrc||''}); }
+  catch(e){ toastError('⚠️ 儲存失敗'); }
+}
 async function removeWallItem(id){
   if(!activeMonth) return;
   const item=data[activeMonth].wall.find(w=>w.id===id||w.fbKey===id);
@@ -1433,11 +1539,48 @@ function renderBooksOverall(){
         </div>
       </div>
       <div class="book-detail">
-        ${descFull?`<div style="font-size:13px;color:var(--ink);line-height:1.7;margin-bottom:8px;">${descFull}</div>`:''}
-        ${b.link?`<a href="${b.link}" target="_blank" style="font-size:12px;color:var(--orange);font-weight:600;text-decoration:none;">🔗 ${b.link.length>50?b.link.slice(0,50)+'…':b.link}</a>`:''}
+        ${b.editing ? `
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div><div class="d-label">Title 標題</div><input type="text" id="be_title_${bid}" value="${b.title.replace(/"/g,'&quot;')}" style="font-size:13px;font-weight:700;"></div>
+            <div><div class="d-label">Description 簡短說明</div><input type="text" id="be_type_${bid}" value="${(b.type||'').replace(/"/g,'&quot;')}"></div>
+            <div><div class="d-label">By 推薦人</div><input type="text" id="be_who_${bid}" value="${(b.who||'').replace(/"/g,'&quot;')}"></div>
+            <div><div class="d-label">Link 連結</div><input type="text" id="be_link_${bid}" value="${(b.link||'').replace(/"/g,'&quot;')}"></div>
+            <div style="display:flex;gap:6px;margin-top:4px;">
+              <button class="btn btn-green btn-sm" onclick="saveBookEdit('${bid}')">✓ 儲存</button>
+              <button class="btn btn-ghost btn-sm" onclick="cancelBookEdit('${bid}')">取消</button>
+            </div>
+          </div>
+        ` : `
+          ${descFull?`<div style="font-size:13px;color:var(--ink);line-height:1.7;margin-bottom:8px;">${descFull}</div>`:''}
+          ${b.link?`<a href="${b.link}" target="_blank" style="font-size:12px;color:var(--orange);font-weight:600;text-decoration:none;">🔗 ${b.link.length>50?b.link.slice(0,50)+'…':b.link}</a>`:''}
+          <div style="margin-top:10px;display:flex;gap:6px;">
+            <button class="btn btn-ghost btn-sm" onclick="startBookEdit('${bid}')">✎ 編輯</button>
+          </div>
+        `}
       </div>
     </div>`;
   }).join('');
+}
+function startBookEdit(bid){
+  const b=overallBooks.find(b=>(b.fbKey||b.id)===bid); if(!b) return;
+  b.editing=true; renderBooksOverall();
+}
+function cancelBookEdit(bid){
+  const b=overallBooks.find(b=>(b.fbKey||b.id)===bid); if(!b) return;
+  b.editing=false; renderBooksOverall();
+}
+async function saveBookEdit(bid){
+  const b=overallBooks.find(b=>(b.fbKey||b.id)===bid); if(!b) return;
+  b.title=document.getElementById(`be_title_${bid}`)?.value.trim()||b.title;
+  b.type=document.getElementById(`be_type_${bid}`)?.value.trim()||'';
+  b.who=document.getElementById(`be_who_${bid}`)?.value.trim()||b.who;
+  b.link=document.getElementById(`be_link_${bid}`)?.value.trim()||'';
+  b.editing=false;
+  renderBooksOverall();
+  toast('✓ 材料已更新');
+  try{
+    await fbSet(`books/${bid}`,{title:b.title,type:b.type,who:b.who,link:b.link,img:b.img||''});
+  }catch(e){ toastError('⚠️ 儲存失敗'); }
 }
 function toggleBookExpand(bookId){
   if(selectedBookId===bookId){
