@@ -1227,15 +1227,24 @@ function renderWallCol(){
 
   if(!mid){
     // Home: show book cards list for responding
+    if(selectedBookId){
+      // a book is already selected — show its responses
+      renderBookResponses(selectedBookId);
+      return;
+    }
     if(label) label.textContent='Home · Response 回應＆參考';
     const el=document.getElementById('wallColList'); if(!el) return;
     if(!overallBooks.length){el.innerHTML='<div class="empty-state">許願池裡還沒有材料</div>';return;}
     el.innerHTML=`<div style="font-size:11px;color:var(--ink-light);margin-bottom:10px;line-height:1.6;">選擇一份材料留下回應</div>`+
-      overallBooks.map(b=>`<div style="background:var(--card-bg);border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all 0.13s;border:1.5px solid transparent;" onmouseenter="this.style.borderColor='var(--orange)'" onmouseleave="this.style.borderColor='transparent'" onclick="selectBookForResponse(${b.id})">
-        <div style="font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:2px;">${b.title}</div>
-        <div style="font-size:10.5px;color:var(--ink-light);">✦ ${b.who}${b.type?' · '+b.type:''}</div>
-        ${(bookWalls[b.id]||[]).length?`<div style="font-size:10px;color:var(--orange);margin-top:4px;">💬 ${(bookWalls[b.id]||[]).length} 則回應</div>`:''}
-      </div>`).join('');
+      overallBooks.map(b=>{
+        const bid=b.fbKey||b.id;
+        const wallCount=(bookWalls[bid]||[]).length;
+        return `<div style="background:var(--card-bg);border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all 0.13s;border:1.5px solid transparent;" onmouseenter="this.style.borderColor='var(--orange)'" onmouseleave="this.style.borderColor='transparent'" onclick="selectBookForResponse('${bid}')">
+          <div style="font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:2px;">${b.title}</div>
+          <div style="font-size:10.5px;color:var(--ink-light);">✦ ${b.who}${b.type?' · '+b.type:''}</div>
+          ${wallCount?`<div style="font-size:10px;color:var(--orange);margin-top:4px;">💬 ${wallCount} 則回應</div>`:''}
+        </div>`;
+      }).join('');
   } else {
     // Month: show wall items for this month
     if(label) label.textContent=`${monthDefs.find(x=>x.id===mid)?.label||''} · Response 回應＆參考`;
@@ -1257,12 +1266,13 @@ function selectBookForResponse(bookId){
 function renderBookResponses(bookId){
   const label=document.getElementById('wallColLabel');
   const el=document.getElementById('wallColList'); if(!el) return;
-  const book=overallBooks.find(b=>b.id===bookId);
+  const book=overallBooks.find(b=>(b.fbKey||b.id)===bookId);
   if(!book) return;
   if(label) label.textContent=`${book.title.length>20?book.title.slice(0,20)+'…':book.title} · 回應＆參考`;
   const responses=bookWalls[bookId]||[];
   const respHtml=responses.length
     ? responses.map(r=>{
+        const rid=r.fbKey||r.id;
         if(r.type==='ref'){
           const thumbHtml = r.imgSrc
             ? `<img class="wall-col-thumb" src="${r.imgSrc}" alt="${r.title}">`
@@ -1276,7 +1286,7 @@ function renderBookResponses(bookId){
               ${r.url?`<a href="${r.url}" target="_blank" class="wall-col-url">${r.url.length>30?r.url.slice(0,30)+'…':r.url}</a>`:''}
               <div class="wall-col-who">✦ ${r.who}</div>
             </div>
-            <button class="wall-col-del" onclick="removeBookWallItem(${bookId},${r.id})">×</button>
+            <button class="wall-col-del" onclick="removeBookWallItem('${bookId}','${rid}')">×</button>
           </div>`;
         }
         return `<div class="wall-col-item type-q">
@@ -1285,7 +1295,7 @@ function renderBookResponses(bookId){
             <div class="wall-col-text">${r.text}</div>
             <div class="wall-col-who">✦ ${r.who}</div>
           </div>
-          <button class="wall-col-del" onclick="removeBookWallItem(${bookId},${r.id})">×</button>
+          <button class="wall-col-del" onclick="removeBookWallItem('${bookId}','${rid}')">×</button>
         </div>`;
       }).join('')
     : '<div class="empty-state">還沒有回應</div>';
@@ -1389,17 +1399,18 @@ function renderBooksOverall(){
   const el=document.getElementById('bookListOverall'); if(!el) return;
   if(!overallBooks.length){el.innerHTML='<div class="empty-state">許願池還空著</div>';return;}
   el.innerHTML=overallBooks.map((b,bi)=>{
+    const bid = b.fbKey||b.id;
     const descFull = b.type||'';
     const descShort = descFull.length > 30 ? descFull.slice(0,30)+'…' : descFull;
-    const respCount = (bookWalls[b.id]||[]).filter(r=>r.type==='response'||!r.type).length;
-    const refCount = (bookWalls[b.id]||[]).filter(r=>r.type==='ref').length;
+    const respCount = (bookWalls[bid]||[]).filter(r=>r.type==='response'||!r.type).length;
+    const refCount = (bookWalls[bid]||[]).filter(r=>r.type==='ref').length;
     const countBadge = [respCount?`💬 ${respCount}`:'', refCount?`🖼 ${refCount}`:''].filter(Boolean).join(' · ');
-    const isExpanded = selectedBookId===b.id;
+    const isExpanded = selectedBookId===bid;
     const thumbHtml = b.img
       ? `<img src="${b.img}" style="width:100%;height:100%;object-fit:cover;">`
       : `<span>📚</span>`;
-    return `<div class="book-row${isExpanded?' expanded':''}" id="bookRow-${b.id}">
-      <div class="book-row-main" onclick="toggleBookExpand(${b.id})">
+    return `<div class="book-row${isExpanded?' expanded':''}" id="bookRow-${bid}">
+      <div class="book-row-main" onclick="toggleBookExpand('${bid}')">
         <div class="book-row-thumb">${thumbHtml}</div>
         <div class="book-row-info">
           <div class="book-row-title">${b.title}</div>
@@ -1409,7 +1420,7 @@ function renderBooksOverall(){
         <div class="book-row-actions">
           ${countBadge?`<span class="book-row-resp-badge">${countBadge}</span>`:''}
           <span class="book-expand-chevron${isExpanded?' open':''}">▼</span>
-          <button class="del-btn" style="position:static;margin-left:2px;" onclick="event.stopPropagation();removeBookOverall(${b.id})">×</button>
+          <button class="del-btn" style="position:static;margin-left:2px;" onclick="event.stopPropagation();removeBookOverall('${bid}')">×</button>
         </div>
       </div>
       <div class="book-detail">
