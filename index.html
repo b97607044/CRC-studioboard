@@ -813,6 +813,40 @@ function ensureMonthData(mid){ if(!data[mid]) data[mid]={cards:[],wall:[]}; }
 function renderMd(text){ if(!text) return ''; try{ return marked.parse(text); }catch(e){ return text.replace(/\n/g,'<br>'); } }
 function parseImgList(val){ if(!val) return []; try{ const p=JSON.parse(val); return Array.isArray(p)?p:[val]; }catch(e){ return val?[val]:[]; } }
 
+// ── LINK THUMBNAIL ──
+function linkThumbHtml(url, cls='wall-col-thumb', style=''){
+  if(!url) return '';
+  try{
+    const u = new URL(url);
+    const domain = u.hostname;
+    let imgSrc = '';
+
+    // YouTube — direct thumbnail URL (free, fast, no API needed)
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if(ytMatch){
+      imgSrc = `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`;
+      return `<img src="${imgSrc}" class="${cls}" style="object-fit:cover;${style}" alt="${domain}">`;
+    }
+
+    // Vimeo — use oEmbed thumbnail
+    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+    if(vimeoMatch){
+      // Vimeo doesn't allow direct img hotlink, fall through to microlink
+    }
+
+    // All other URLs — microlink OG image (25 free req/day)
+    imgSrc = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=false&meta=true&embed=image.url`;
+    const faviconSrc = `https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(url)}&size=128`;
+    return `<img
+      src="${imgSrc}"
+      class="${cls}"
+      style="object-fit:cover;${style}"
+      alt="${domain}"
+      onerror="this.src='${faviconSrc}';this.style.objectFit='contain';this.style.padding='12px';this.style.background='#f5f5f6'"
+    >`;
+  }catch(e){ return ''; }
+}
+
 // ── API ──
 // ── FIREBASE HELPERS (proxy to window._fb set after dynamic import) ──
 function waitFb(){ return new Promise(resolve=>{ const t=setInterval(()=>{ if(window._fb){clearInterval(t);resolve();} },50); }); }
@@ -1093,7 +1127,10 @@ function renderCardList(mid){
   el.innerHTML=cards.map((c,ci)=>{
     const emo=CARD_EMOJIS[ci%CARD_EMOJIS.length];
     const cid=c.fbKey||c.id;
-    const thumbHtml=c.refImgs&&c.refImgs.length?`<img src="${c.refImgs[0]}" style="width:100%;height:100%;object-fit:cover;">`:`<span>${emo}</span>`;
+    const thumbHtml=c.refImgs&&c.refImgs.length
+      ?`<img src="${c.refImgs[0]}" style="width:100%;height:100%;object-fit:cover;">`
+      :c.refUrl?linkThumbHtml(c.refUrl,'','width:100%;height:100%;')
+      :`<span>${emo}</span>`;
     return `<div class="card-row${c.expanded?' expanded':''}" id="cardRow-${cid}">
       <div class="card-row-main" onclick="toggleCardExpand('${mid}','${cid}')">
         <div class="card-row-thumb">${thumbHtml}</div>
@@ -1348,7 +1385,7 @@ function renderWallCol(){
         </div>`;
       }
       if(w.type==='q') return `<div class="wall-col-item type-q"><div class="wall-col-body"><span class="wall-col-type type-q">提問</span><div class="wall-col-text">${renderMd(w.text)}</div><div class="wall-col-who">✦ ${w.who}</div></div><div style="position:absolute;top:5px;right:5px;display:flex;gap:3px;"><button onclick="startWallEdit('${wid}')" style="background:white;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;color:var(--ink-light);display:flex;align-items:center;justify-content:center;">✎</button><button class="wall-col-del" style="position:static;" onclick="removeWallItem('${wid}')">×</button></div></div>`;
-      const thumbHtml=w.imgSrc?`<img class="wall-col-thumb" src="${w.imgSrc}" alt="${w.title}">`:w.url?`<div class="wall-col-placeholder">🔗</div>`:'';
+      const thumbHtml=w.imgSrc?`<img class="wall-col-thumb" src="${w.imgSrc}" alt="${w.title}">`:w.url?linkThumbHtml(w.url,'wall-col-thumb','height:70px;width:100%;'):'';
       return `<div class="wall-col-item type-link">${thumbHtml}<div class="wall-col-body"><span class="wall-col-type type-link">參考</span><div class="wall-col-title">${w.title}</div>${w.desc?`<div class="wall-col-desc">${w.desc}</div>`:''}${w.url?`<a href="${w.url}" target="_blank" class="wall-col-url">${w.url.length>30?w.url.slice(0,30)+'…':w.url}</a>`:''}<div class="wall-col-who">✦ ${w.who}</div></div><div style="position:absolute;top:5px;right:5px;display:flex;gap:3px;"><button onclick="startWallEdit('${wid}')" style="background:white;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;color:var(--ink-light);display:flex;align-items:center;justify-content:center;">✎</button><button class="wall-col-del" style="position:static;" onclick="removeWallItem('${wid}')">×</button></div></div>`;
     }).join('');
   }
@@ -1371,7 +1408,7 @@ function renderBookResponses(bookId){
         if(r.type==='ref'){
           const thumbHtml = r.imgSrc
             ? `<img class="wall-col-thumb" src="${r.imgSrc}" alt="${r.title}">`
-            : (r.url ? `<div class="wall-col-placeholder">🔗</div>` : '');
+            : (r.url ? linkThumbHtml(r.url,'wall-col-thumb','height:70px;width:100%;') : '');
           return `<div class="wall-col-item type-link">
             ${thumbHtml}
             <div class="wall-col-body">
@@ -1523,7 +1560,7 @@ function renderBooksOverall(){
     const isExpanded = selectedBookId===bid;
     const thumbHtml = b.img
       ? `<img src="${b.img}" style="width:100%;height:100%;object-fit:cover;">`
-      : `<span>📚</span>`;
+      : b.link ? linkThumbHtml(b.link,'','width:100%;height:100%;') : `<span>📚</span>`;
     return `<div class="book-row${isExpanded?' expanded':''}" id="bookRow-${bid}">
       <div class="book-row-main" onclick="toggleBookExpand('${bid}')">
         <div class="book-row-thumb">${thumbHtml}</div>
