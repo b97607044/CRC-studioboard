@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyborg Resilience Co-lab · Research Board</title>
+<meta name="description" content="每月主題 · 材料許願池 · 研究小卡 · 提問與參考牆">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://b97607044.github.io/CRC-studioboard/">
+<meta property="og:title" content="Cyborg Resilience Co-lab · Research Board">
+<meta property="og:description" content="每月主題 · 材料許願池 · 研究小卡 · 提問與參考牆">
+<meta property="og:image" content="https://b97607044.github.io/CRC-studioboard/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cyborg Resilience Co-lab · Research Board">
+<meta name="twitter:description" content="每月主題 · 材料許願池 · 研究小卡 · 提問與參考牆">
+<meta name="twitter:image" content="https://b97607044.github.io/CRC-studioboard/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/16.3.0/lib/marked.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --face-green: #6FE6A0; --face-pink: #F178C2; --face-orange: #FF8A4C;
+  --face-blue: #5BB8F5; --face-purple: #B187F5; --face-yellow: #FFD23F; --face-red: #FF6B5B;
+  --orange: #FF6A2B; --orange-dark: #E2540E;
+  --ink: #1c1c1e; --ink-light: #8a8a8e; --ink-faint: #c4c4c8;
+  --bg: #ffffff; --card-bg: #f5f5f6; --border-soft: #ececed;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif; font-weight: 400;
+  background: radial-gradient(circle at 50% 0%, #eafff4 0%, #ffffff 55%);
+  color: var(--ink); min-height: 100vh; padding: 24px 14px;
+  position: relative; overflow-x: hidden;
+}
+.frame {
+  max-width: 1160px; margin: 0 auto; background: var(--bg); border-radius: 36px;
+  overflow: hidden; position: relative;
+  background: linear-gradient(white, white) padding-box,
+    radial-gradient(circle at 50% 0%, rgba(111,230,160,0.9) 0%, rgba(111,230,160,0.35) 45%, rgba(111,230,160,0) 80%) border-box;
+  border: 5px solid transparent;
+  box-shadow: 0 0 36px rgba(111,230,160,0.45), 0 0 70px rgba(111,230,160,0.2), 0 12px 0 rgba(0,0,0,0.03);
+}
+
+/* ── FLOATING STICKERS ── */
+.face-sticker { position: fixed; font-size: 30px; pointer-events: none; z-index: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08)); animation: floatSpin linear infinite; }
+@keyframes floatSpin {
+  0% { transform: translate(0,0) rotate(0deg); } 25% { transform: translate(14px,-18px) rotate(90deg); }
+  50% { transform: translate(-6px,-30px) rotate(180deg); } 75% { transform: translate(-18px,-10px) rotate(270deg); }
+  100% { transform: translate(0,0) rotate(360deg); }
+}
+.face-badge { display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%; font-size: 14px; flex-shrink: 0;
+  animation: wiggle 3.2s ease-in-out infinite; }
+@keyframes wiggle { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+
+/* ── HEADER ── */
+.header { padding: 20px 28px 14px; position: relative; z-index: 2; border-bottom: 1px solid var(--border-soft); }
+.header-top { display: flex; align-items: flex-start; justify-content: space-between; }
+.logo { font-family: 'Baloo 2', cursive; font-size: 28px; font-weight: 800; color: var(--orange); line-height: 1.1; }
+.logo-line1 { display: inline-block; animation: logoFloat1 4.5s ease-in-out infinite; }
+.logo-line2 { display: inline-block; animation: logoFloat2 4.5s ease-in-out infinite; animation-delay: 0.3s; margin-top: 1px; }
+@keyframes logoFloat1 { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-3px) rotate(1deg); } }
+@keyframes logoFloat2 { 0%, 100% { transform: translateY(0) rotate(1.5deg); } 50% { transform: translateY(-3px) rotate(-1deg); } }
+.header-sub { font-size: 12px; font-weight: 500; color: var(--ink-light); margin-top: 4px; }
+
+/* ── THREE-COLUMN LAYOUT ── */
+.three-col { display: grid; grid-template-columns: 180px 1fr 280px; min-height: calc(100vh - 120px); position: relative; z-index: 2; transition: grid-template-columns 0.25s ease; }
+.three-col.left-collapsed { grid-template-columns: 36px 1fr 280px; }
+.three-col.right-collapsed { grid-template-columns: 180px 1fr 36px; }
+.three-col.left-collapsed.right-collapsed { grid-template-columns: 36px 1fr 36px; }
+.col-divider { border-right: 1px solid var(--border-soft); }
+
+/* ── LEFT SIDEBAR ── */
+.left-col { padding: 20px 12px 24px 20px; display: flex; flex-direction: column; gap: 6px; position: sticky; top: 0; height: fit-content; overflow: visible; min-width: 0; }
+.left-col-content { display: flex; flex-direction: column; gap: 6px; transition: opacity 0.2s; }
+.left-collapsed .left-col-content { opacity: 0; pointer-events: none; }
+/* ── FLOATING COLLAPSE TOGGLES ── */
+.col-toggle-btn {
+  width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--border-soft);
+  background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--ink-light); flex-shrink: 0; transition: all 0.13s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.col-toggle-btn:hover { border-color: var(--orange); color: var(--orange); background: #fff5f0; }
+.left-col-toggle {
+  position: absolute; right: -14px; top: 20px; z-index: 10;
+}
+.right-col-toggle {
+  position: absolute;
+  right: 280px; /* width of right col */
+  top: 20px;
+  z-index: 20;
+  transform: translateX(50%); /* center on the boundary */
+}
+.right-collapsed .right-col-toggle {
+  right: 36px; /* width when collapsed */
+}
+.nav-home-btn {
+  font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700;
+  padding: 10px 14px; border-radius: 14px; border: none;
+  background: var(--card-bg); color: var(--ink-light); cursor: pointer;
+  text-align: left; transition: all 0.13s; width: 100%;
+}
+.nav-home-btn:hover { background: #efefef; color: var(--ink); }
+.nav-home-btn.active { background: var(--orange); color: white; }
+.nav-section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); padding: 8px 14px 4px; }
+.month-pill-wrap { position: relative; }
+.month-pill {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 13px;
+  padding: 9px 14px; border-radius: 14px; border: none;
+  background: transparent; color: var(--ink-light); cursor: pointer;
+  text-align: left; transition: all 0.13s; display: flex; align-items: center; gap: 7px; width: 100%;
+}
+.month-pill:hover { background: var(--card-bg); color: var(--ink); }
+.month-pill.active { background: var(--ink); color: white; }
+.month-count { font-size: 10px; opacity: 0.6; font-weight: 500; }
+.month-pill-del {
+  position: absolute; top: 50%; right: 6px; transform: translateY(-50%);
+  background: rgba(0,0,0,0.1); border: none; border-radius: 50%;
+  width: 16px; height: 16px; font-size: 10px; color: inherit; cursor: pointer;
+  display: none; align-items: center; justify-content: center; line-height: 1;
+}
+.month-pill-wrap:hover .month-pill-del { display: flex; }
+.month-pill-del:hover { background: rgba(0,0,0,0.3); }
+.month-kw-row { font-size: 9.5px; color: var(--ink-faint); line-height: 1.5; padding: 0 14px 6px; word-break: break-word; }
+.month-add-btn {
+  font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600;
+  padding: 8px 14px; border-radius: 14px; border: 1.5px dashed var(--ink-faint);
+  background: transparent; color: var(--ink-light); cursor: pointer; text-align: center; transition: all 0.13s;
+}
+.month-add-btn:hover { border-color: var(--orange); color: var(--orange); background: #fff5f0; }
+
+/* ── MIDDLE COLUMN ── */
+.mid-col { padding: 0; overflow: hidden; }
+.page-view { display: none; }
+.page-view.active { display: block; }
+
+/* Home page */
+.home-page { padding: 24px 24px; }
+.home-section-title { font-size: 13px; font-weight: 700; color: var(--ink-light); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.home-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border-soft); }
+
+/* Month page */
+.month-page { display: flex; flex-direction: column; }
+
+/* Month header band */
+.month-band {
+  background: var(--ink); padding: 20px 24px; display: flex; flex-direction: column; gap: 14px;
+}
+.month-band-top { display: flex; align-items: center; gap: 12px; }
+.month-band-name { font-family: 'Baloo 2', cursive; font-size: 28px; font-weight: 800; color: white; }
+.month-band-stats { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 500; }
+
+/* Keywords area */
+.kw-area { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+.kw-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+.rtag { display: inline-flex; align-items: center; gap: 3px; font-size: 11.5px; font-weight: 500; padding: 4px 11px; border-radius: 20px; color: var(--ink); }
+.rtag-icon-btn { background: none; border: none; color: inherit; cursor: pointer; font-size: 11px; line-height: 1; padding: 0 0 0 2px; opacity: 0.6; transition: opacity 0.12s; }
+.rtag-icon-btn:hover { opacity: 1; }
+.rtag-add { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 12px; background: rgba(255,255,255,0.08); border: 1.5px dashed rgba(255,255,255,0.3); color: rgba(255,255,255,0.65); cursor: pointer; }
+.rtag-editing { background: white; display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; }
+
+/* Core questions */
+.core-qs { display: flex; flex-direction: column; gap: 6px; }
+.core-q-row { display: flex; gap: 8px; align-items: flex-start; }
+.core-q-num { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.35); min-width: 16px; padding-top: 8px; }
+textarea.core-q-input {
+  font-family: 'Noto Sans TC', 'Space Grotesk', sans-serif; font-weight: 400; font-size: 13px;
+  color: white; background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 10px; padding: 7px 11px; width: 100%; resize: vertical; outline: none; line-height: 1.6;
+}
+textarea.core-q-input:focus { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.14); }
+textarea.core-q-input::placeholder { color: rgba(255,255,255,0.35); }
+.save-indicator { font-size: 10px; color: var(--face-green); opacity: 0; transition: opacity 0.3s; font-weight: 600; }
+.save-indicator.show { opacity: 1; }
+
+/* Materials list (Research Cards horizontal) */
+.materials-area { padding: 20px 24px; }
+.materials-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.materials-label { font-size: 13px; font-weight: 700; color: var(--ink); letter-spacing: 0.02em; }
+.materials-count { font-size: 11px; color: var(--ink-light); font-weight: 500; }
+
+/* Horizontal card list */
+.card-list { display: flex; flex-direction: column; gap: 10px; }
+.card-row { background: var(--card-bg); border-radius: 16px; overflow: hidden; cursor: default; transition: all 0.15s; border: 1.5px solid transparent; flex-direction: column; display: flex; }
+.card-row:hover { border-color: var(--orange); background: white; }
+.card-row.expanded { border-color: var(--ink); background: white; }
+.card-row-main { display: flex; align-items: stretch; cursor: pointer; }
+.card-detail-tabs-bar { display: flex; align-items: stretch; border-top: 1.5px solid var(--border-soft); background: white; }
+.card-row-thumb {
+  width: 80px; flex-shrink: 0; background: var(--border-soft);
+  display: flex; align-items: center; justify-content: center; font-size: 26px;
+  border-right: 1.5px solid var(--border-soft);
+}
+.card-row-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.card-row-info { flex: 1; padding: 12px 14px 12px 0; min-width: 0; }
+.card-row-title { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-row-meta { font-size: 11px; color: var(--ink-light); margin-bottom: 6px; }
+.card-row-kws { display: flex; flex-wrap: wrap; gap: 4px; }
+.card-row-kw { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; background: #EDE3FF; color: #6B3FD4; }
+.card-row-actions { display: flex; align-items: center; gap: 6px; padding: 12px 14px 12px 0; flex-shrink: 0; }
+.card-comments-badge { font-size: 11px; font-weight: 600; color: var(--ink-light); background: var(--border-soft); padding: 3px 9px; border-radius: 20px; }
+.card-expand-chevron { font-size: 12px; color: var(--ink-faint); transition: transform 0.2s; }
+.card-row.expanded .card-expand-chevron { transform: rotate(180deg); }
+
+/* Expanded card detail */
+.card-detail { display: none; border-top: 1.5px solid var(--border-soft); }
+.card-row.expanded .card-detail { display: block; }
+
+.detail-tab-row { display: flex; background: white; } /* legacy - kept for safety */
+.detail-tab {
+  flex: 1; padding: 10px 8px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  cursor: pointer; border: none; font-family: 'Space Grotesk', sans-serif; transition: all 0.15s; border-right: 1px solid var(--border-soft);
+}
+.detail-tab:last-child { border-right: none; }
+.detail-tab-label { font-size: 11px; font-weight: 800; letter-spacing: 0.03em; }
+.detail-tab-chevron { font-size: 9px; transition: transform 0.2s; }
+.detail-tab-chevron.open { transform: rotate(180deg); }
+.detail-tab.tab-summary { background: #F4EFFE; }
+.detail-tab.tab-summary .detail-tab-label, .detail-tab.tab-summary .detail-tab-chevron { color: #9B7FE0; }
+.detail-tab.tab-summary:hover, .detail-tab.tab-summary.open { background: #6B3FD4; }
+.detail-tab.tab-summary.open .detail-tab-label, .detail-tab.tab-summary.open .detail-tab-chevron { color: white; }
+.detail-tab.tab-imagination { background: #EEFBF3; }
+.detail-tab.tab-imagination .detail-tab-label, .detail-tab.tab-imagination .detail-tab-chevron { color: #5BBE89; }
+.detail-tab.tab-imagination:hover, .detail-tab.tab-imagination.open { background: #1B8A50; }
+.detail-tab.tab-imagination.open .detail-tab-label, .detail-tab.tab-imagination.open .detail-tab-chevron { color: white; }
+.detail-tab.tab-reference { background: #FFF8E9; }
+.detail-tab.tab-reference .detail-tab-label, .detail-tab.tab-reference .detail-tab-chevron { color: #E0AC4D; }
+.detail-tab.tab-reference:hover, .detail-tab.tab-reference.open { background: #C2790E; }
+.detail-tab.tab-reference.open .detail-tab-label, .detail-tab.tab-reference.open .detail-tab-chevron { color: white; }
+
+.detail-section { display: none; padding: 16px 20px; }
+.detail-section.open { display: block; }
+.detail-section.ds-summary { background: #FAF7FF; }
+.detail-section.ds-imagination { background: #F2FCF7; }
+.detail-section.ds-reference { background: #FFFAF0; }
+
+.d-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; }
+.d-grid > div { display: flex; flex-direction: column; }
+.d-label { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 5px; color: #6B3FD4; }
+.d-label.green { color: #1B8A50; }
+.d-label.amber { color: #C2790E; }
+.d-val { flex: 1; font-family: 'Noto Sans TC', 'Space Grotesk', sans-serif; font-size: 13px; line-height: 1.7; background: white; border-radius: 12px; padding: 10px 13px; min-height: 44px; border: 1.5px solid var(--border-soft); border-left-width: 4px; border-left-color: #D9CCFA; color: var(--ink); }
+.d-val.green { border-left-color: #B6E8CC; }
+.d-val.amber { border-left-color: #FBE0AD; }
+.d-val.empty { color: var(--ink-faint); }
+.d-val.markdown-body p { margin-bottom: 6px; }
+.d-val.markdown-body p:last-child { margin-bottom: 0; }
+.d-val.markdown-body ul, .d-val.markdown-body ol { padding-left: 18px; margin-bottom: 6px; }
+.d-val.markdown-body a { color: var(--orange); }
+.d-val.markdown-body strong { font-weight: 700; }
+.ref-img-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; margin-bottom: 10px; }
+.ref-gallery-img { width: 100%; height: 80px; object-fit: cover; border-radius: 10px; }
+
+.card-edit-actions { display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-top: 1px solid var(--border-soft); background: white; }
+
+/* Add card CTA */
+.add-card-cta {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px; background: transparent; border: 2px dashed var(--border-soft);
+  border-radius: 16px; cursor: pointer; transition: all 0.15s; width: 100%;
+  font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: var(--ink-light);
+}
+.add-card-cta:hover { border-color: var(--orange); color: var(--orange); background: #fff5f0; }
+
+/* Submit form (2b page) */
+.submit-page { display: none; }
+.submit-page.active { display: grid; grid-template-columns: 1fr 280px; min-height: calc(100vh - 80px); }
+.submit-main { padding: 24px 28px; overflow-y: auto; }
+.submit-top-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.submit-back-btn { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: var(--ink-light); background: var(--card-bg); border: 2px solid transparent; border-radius: 20px; padding: 7px 14px; cursor: pointer; transition: all 0.13s; }
+.submit-back-btn:hover { border-color: var(--orange); color: var(--orange); background: white; }
+.submit-month-label { font-size: 12px; color: var(--ink-light); font-weight: 500; }
+.submit-kw-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+.submit-kw { font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: var(--face-yellow); color: #6b4d00; }
+
+.step-block { margin-bottom: 28px; }
+.step-num { font-size: 11px; font-weight: 700; color: var(--ink-faint); letter-spacing: 0.08em; margin-bottom: 4px; }
+.step-title { font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 16px; }
+.step-progress { font-size: 11px; font-weight: 600; color: var(--ink-light); margin-left: 8px; }
+
+/* type pills (書/論文/影像/其他) */
+.type-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.type-pill {
+  font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600;
+  padding: 6px 16px; border-radius: 20px; border: 2px solid var(--border-soft);
+  background: white; color: var(--ink-light); cursor: pointer; transition: all 0.13s;
+}
+.type-pill:hover { border-color: var(--orange); color: var(--orange); }
+.type-pill.active { background: var(--ink); border-color: var(--ink); color: white; }
+
+.field-block { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.field-label { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-light); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+textarea, input[type="text"] {
+  font-family: 'Noto Sans TC', 'Space Grotesk', sans-serif; font-weight: 400; font-size: 13px; color: var(--ink);
+  background: var(--card-bg); border: 1.5px solid transparent; border-radius: 12px; padding: 8px 11px;
+  width: 100%; resize: vertical; outline: none; transition: border-color 0.13s, background 0.13s; line-height: 1.65;
+}
+textarea:focus, input[type="text"]:focus { border-color: var(--orange); background: white; }
+.bordered-summary textarea, .bordered-summary input { border: 2px solid #D9CCFA; }
+.bordered-summary textarea:focus, .bordered-summary input:focus { border-color: var(--orange); }
+.bordered-imagination textarea, .bordered-imagination input { border: 2px solid #B6E8CC; }
+.bordered-imagination textarea:focus, .bordered-imagination input:focus { border-color: var(--orange); }
+.bordered-reference textarea, .bordered-reference input { border: 2px solid #FBE0AD; }
+.bordered-reference textarea:focus, .bordered-reference input:focus { border-color: var(--orange); }
+
+.file-upload-btn {
+  font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif; font-size: 12px; font-weight: 500;
+  color: var(--ink-light); background: var(--card-bg); border: 1.5px solid transparent;
+  border-radius: 12px; padding: 9px 11px; width: 100%; display: flex; align-items: center;
+  cursor: pointer; transition: border-color 0.13s, background 0.13s; line-height: 1.4;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.file-upload-btn:hover { border-color: var(--orange); background: white; color: var(--ink); }
+
+.step-section-label {
+  font-size: 13px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 6px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 10px; margin-top: 4px;
+}
+.step-section-label.summary { background: #EDE3FF; color: #6B3FD4; }
+.step-section-label.imagination { background: #D9F7E6; color: #1B8A50; }
+.step-section-label.reference { background: #FFF1D6; color: #C2790E; }
+
+/* Submit sidebar (card preview) */
+.submit-sidebar { border-left: 1px solid var(--border-soft); padding: 24px 20px; display: flex; flex-direction: column; gap: 16px; background: var(--card-bg); }
+.submit-actions { display: flex; flex-direction: column; gap: 8px; }
+.preview-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 8px; }
+.card-preview-box { background: white; border-radius: 16px; border: 1.5px solid var(--border-soft); overflow: hidden; }
+.preview-header { background: var(--ink); padding: 12px 14px; }
+.preview-title { font-size: 13px; font-weight: 700; color: white; margin-bottom: 2px; }
+.preview-meta { font-size: 10px; color: rgba(255,255,255,0.5); }
+.preview-kws { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.preview-kw { font-size: 10px; padding: 1px 7px; border-radius: 20px; background: rgba(255,255,255,0.18); color: white; }
+.preview-body { padding: 10px 12px; font-size: 11.5px; color: var(--ink-light); line-height: 1.6; }
+.preview-type-badge { display: inline-block; font-size: 9.5px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-bottom: 6px; }
+
+/* ── RIGHT COLUMN ── */
+.right-col { padding: 0; border-left: 1px solid var(--border-soft); display: flex; flex-direction: column; overflow: visible; min-width: 0; transition: grid-template-columns 0.25s ease; position: relative; }
+.right-col-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 0; }
+.right-col-inner { padding: 10px 18px 10px; flex: 1; overflow-y: auto; }
+.right-collapsed .right-col-inner, .right-collapsed .wall-form-area, .right-collapsed .right-col-label-wrap { opacity: 0; pointer-events: none; }
+.right-col-section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-light); }
+
+/* Wall in right col: vertical stacked items */
+.wall-col-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.wall-col-item { background: var(--card-bg); border-radius: 14px; overflow: hidden; position: relative; transition: transform 0.13s; }
+.wall-col-item:hover { transform: translateY(-1px); }
+.wall-col-item.type-q { border-left: 3px solid var(--face-green); }
+.wall-col-item.type-link, .wall-col-item.type-img { border-left: 3px solid var(--face-yellow); }
+.wall-col-thumb { width: 100%; height: 70px; object-fit: cover; display: block; }
+.wall-col-placeholder { width: 100%; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: #fffaf0; }
+.wall-col-body { padding: 9px 11px; }
+.wall-col-type { font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 1px 6px; border-radius: 20px; display: inline-block; margin-bottom: 4px; }
+.wall-col-type.type-q { background: #D9F7E6; color: #1B8A50; }
+.wall-col-type.type-link, .wall-col-type.type-img { background: #FFF1D6; color: #C2790E; }
+.wall-col-text { font-size: 12px; color: var(--ink); line-height: 1.6; margin-bottom: 4px; }
+.wall-col-title { font-size: 12px; font-weight: 700; color: var(--ink); line-height: 1.4; margin-bottom: 3px; }
+.wall-col-desc { font-size: 11px; color: var(--ink-light); line-height: 1.5; }
+.wall-col-url { font-size: 10px; color: var(--orange); text-decoration: none; display: block; margin-top: 2px; word-break: break-all; }
+.wall-col-who { font-size: 10px; color: var(--ink-faint); margin-top: 4px; font-weight: 500; }
+.wall-col-del { position: absolute; top: 5px; right: 5px; background: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; cursor: pointer; color: var(--ink-light); display: flex; align-items: center; justify-content: center; }
+.wall-col-del:hover { background: var(--ink-faint); color: white; }
+
+/* Wall form */
+.wall-form-area { border-top: 1px solid var(--border-soft); padding: 14px 18px; background: var(--card-bg); }
+.wall-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
+.wall-tab-btn { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 20px; border: none; cursor: pointer; background: white; color: var(--ink-light); transition: all 0.13s; }
+.wall-tab-btn.active.q-style { background: var(--face-green); color: #0d4d2a; }
+.wall-tab-btn.active.link-style { background: var(--face-yellow); color: #6b4d00; }
+.wall-panel { display: none; flex-direction: column; gap: 7px; }
+.wall-panel.active { display: flex; }
+.wall-form-row { display: flex; gap: 7px; align-items: flex-end; }
+
+/* Book cards (Home) */
+.book-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.book-row { background: var(--card-bg); border-radius: 16px; overflow: hidden; cursor: default; transition: all 0.15s; border: 1.5px solid transparent; display: flex; flex-direction: column; }
+.book-row:hover { border-color: var(--orange); background: white; }
+.book-row.expanded { border-color: var(--ink); background: white; }
+.book-row-main { display: flex; align-items: stretch; cursor: pointer; }
+.book-row-thumb { width: 72px; flex-shrink: 0; background: var(--border-soft); display: flex; align-items: center; justify-content: center; font-size: 22px; border-right: 1.5px solid var(--border-soft); min-height: 64px; }
+.book-row-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.book-row-info { flex: 1; padding: 12px 14px; min-width: 0; }
+.book-row-title { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.book-row-desc { font-size: 12px; color: var(--ink-light); margin-bottom: 4px; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.book-row-meta { font-size: 11px; color: var(--ink-light); }
+.book-row-actions { display: flex; align-items: center; gap: 8px; padding: 12px 14px 12px 0; flex-shrink: 0; }
+.book-row-resp-badge { font-size: 10.5px; font-weight: 600; color: var(--orange); background: #fff5f0; padding: 2px 9px; border-radius: 20px; }
+.book-expand-chevron { font-size: 11px; color: var(--ink-faint); transition: transform 0.2s; }
+.book-row.expanded .book-expand-chevron { transform: rotate(180deg); }
+.book-detail { display: none; padding: 14px 18px; border-top: 1.5px solid var(--border-soft); background: var(--card-bg); }
+.book-row.expanded .book-detail { display: block; }
+.book-type-badge { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.04em; padding: 2px 7px; border-radius: 20px; margin-bottom: 5px; }
+.badge-other { background: #FFF1D6; color: #C2790E; }
+.book-name { font-size: 12.5px; font-weight: 700; color: var(--ink); line-height: 1.4; margin-bottom: 3px; }
+.book-who { font-size: 11px; color: var(--ink-light); margin-bottom: 5px; }
+.book-link { font-size: 11px; color: var(--orange); display: inline-flex; align-items: center; gap: 2px; text-decoration: none; font-weight: 600; }
+.book-link:hover { text-decoration: underline; }
+.del-btn { position: absolute; top: 7px; right: 7px; background: var(--card-bg); border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; color: var(--ink-light); display: flex; align-items: center; justify-content: center; }
+.del-btn:hover { background: var(--ink-faint); color: white; }
+.add-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; padding: 12px 14px; background: var(--card-bg); border-radius: 14px; }
+.field-group { display: flex; flex-direction: column; gap: 4px; }
+
+/* Buttons */
+.btn { font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif; font-weight: 600; font-size: 13px; padding: 8px 18px; border-radius: 20px; border: none; background: var(--orange); color: white; cursor: pointer; transition: all 0.13s; white-space: nowrap; }
+.btn:hover { background: var(--orange-dark); }
+.btn:active { transform: scale(0.96); }
+.btn-ghost { background: var(--card-bg); color: var(--ink); border: 2px solid transparent; }
+.btn-ghost:hover { border-color: var(--orange); color: var(--orange); background: white; }
+.btn-green { background: var(--face-green); color: #0d4d2a; }
+.btn-green:hover { background: #57c987; }
+.btn-dark { background: var(--ink); color: white; }
+.btn-dark:hover { background: #333; }
+.btn-sm { font-size: 12px; padding: 6px 14px; }
+
+.empty-state { font-size: 13px; font-weight: 500; color: var(--ink-faint); text-align: center; padding: 20px 0; }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(28,28,30,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(3px); padding: 20px; }
+.modal-box { background: white; border-radius: 24px; padding: 26px 28px; max-width: 360px; width: 100%; text-align: center; box-shadow: 0 12px 40px rgba(0,0,0,0.2); }
+.modal-title { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.modal-sub { font-size: 12.5px; color: var(--ink-light); line-height: 1.6; }
+.emoji-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 16px; }
+.emoji-option { font-size: 22px; background: var(--card-bg); border: none; border-radius: 14px; width: 100%; aspect-ratio: 1; cursor: pointer; transition: all 0.13s; display: flex; align-items: center; justify-content: center; }
+.emoji-option:hover { background: #eafff4; transform: scale(1.08); }
+
+/* Loading / Toast */
+.loading-overlay { position: fixed; inset: 0; background: rgba(28,28,30,0.45); display: flex; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(3px); }
+.loading-box { background: white; border-radius: 22px; padding: 28px 36px; text-align: center; }
+.loading-spinner { width: 34px; height: 34px; border: 3px solid var(--card-bg); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 14px; font-weight: 600; color: var(--ink); }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: white; font-size: 13px; font-weight: 600; padding: 10px 22px; border-radius: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); z-index: 999; white-space: nowrap; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.error { background: var(--face-red); }
+
+.setup-banner { background: #FFF1D6; border-radius: 14px; padding: 12px 16px; margin-bottom: 16px; display: flex; gap: 10px; align-items: flex-start; }
+.setup-banner-text { font-size: 12px; color: #6b4d00; line-height: 1.6; }
+.setup-banner-text strong { color: #c2790e; font-weight: 700; }
+.setup-banner-text code { background: rgba(255,255,255,0.6); padding: 1px 4px; border-radius: 4px; font-size: 11px; }
+
+/* ── TABLET (768–900px): hide right col by default, keep left narrower ── */
+@media (max-width: 900px) {
+  .three-col { grid-template-columns: 150px 1fr 0px; }
+  .three-col.right-collapsed { grid-template-columns: 150px 1fr 0px; }
+  .right-col { width: 0; overflow: hidden; border: none; transition: width 0.25s; }
+  /* right col slides in as overlay when opened on tablet */
+  .right-col.mobile-open {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 300px;
+    z-index: 200; background: white; box-shadow: -4px 0 24px rgba(0,0,0,0.14);
+    overflow-y: auto; border-left: 1px solid var(--border-soft);
+  }
+  .right-col-toggle {
+    position: fixed; bottom: 80px; right: 14px;
+    width: 42px; height: 42px; border-radius: 50%; z-index: 201;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    background: var(--ink); color: white; border: none; font-size: 16px;
+  }
+  .right-col-toggle:hover { background: #333; }
+  .submit-page { grid-template-columns: 1fr; }
+  .submit-sidebar { display: none; }
+  .face-sticker { display: none; }
+}
+
+/* ── MOBILE (<640px): bottom tab bar, full-width panels ── */
+@media (max-width: 640px) {
+  body { padding: 8px 0; }
+  .frame { border-radius: 0; border-left: none; border-right: none; }
+  .header { padding: 14px 16px 10px; }
+  .logo { font-size: 22px; }
+  .header-sub { display: none; }
+
+  /* Three-col becomes single-column, panels shown/hidden by JS */
+  .three-col {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto;
+    position: relative;
+  }
+  .left-col {
+    display: none; /* controlled by JS mobile tab */
+    padding: 12px 16px 12px;
+    position: static;
+    flex-direction: column;
+    border-right: none;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .left-col.mobile-active { display: flex; }
+  .left-col-toggle { display: none; }
+
+  .mid-col { display: none; }
+  .mid-col.mobile-active { display: block; }
+
+  .right-col {
+    display: none; width: auto; position: static;
+    border: none; border-top: 1px solid var(--border-soft);
+    box-shadow: none;
+  }
+  .right-col.mobile-active { display: flex; }
+  .right-col-toggle { display: none; }
+
+  /* Bottom tab bar */
+  .mobile-tab-bar {
+    display: flex; position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; border-top: 1px solid var(--border-soft);
+    z-index: 300; height: 56px;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+  }
+  .mobile-tab-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; border: none; background: none; cursor: pointer;
+    font-family: 'Space Grotesk', sans-serif; font-size: 9.5px; font-weight: 600;
+    color: var(--ink-light); padding: 6px 4px; transition: all 0.13s;
+  }
+  .mobile-tab-btn.active { color: var(--orange); }
+  .mobile-tab-btn-icon { font-size: 18px; }
+  body { padding-bottom: 64px; }
+
+  .d-grid, .field-row, .form-grid-2 { grid-template-columns: 1fr; }
+  .three-col.left-collapsed, .three-col.right-collapsed,
+  .three-col.left-collapsed.right-collapsed { grid-template-columns: 1fr !important; }
+  .submit-main { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Mobile bottom tab bar (hidden on desktop via CSS) -->
+<div class="mobile-tab-bar" id="mobileTabBar" style="display:none;">
+  <button class="mobile-tab-btn active" id="mTabNav" onclick="setMobileTab('nav')">
+    <span class="mobile-tab-btn-icon">☰</span>Months
+  </button>
+  <button class="mobile-tab-btn" id="mTabMain" onclick="setMobileTab('main')">
+    <span class="mobile-tab-btn-icon">📋</span>Content
+  </button>
+  <button class="mobile-tab-btn" id="mTabWall" onclick="setMobileTab('wall')">
+    <span class="mobile-tab-btn-icon">💬</span>Response
+  </button>
+</div>
+
+<div id="faceStickers"></div>
+
+<div class="frame">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-top">
+      <div class="logo">
+        <div><span class="logo-line1">Cyborg Resilience Co-lab</span></div>
+        <div><span class="logo-line2">Research Board</span></div>
+      </div>
+    </div>
+    <div class="header-sub">Monthly Topics · Material Pool · Research Cards · Response & Reference Wall</div>
+  </header>
+
+  <!-- MAIN: three-col (left sidebar | mid content | right wall) -->
+  <div class="three-col" id="mainThreeCol">
+    <!-- Right-col toggle: floats at the boundary, always visible -->
+    <button class="col-toggle-btn right-col-toggle" onclick="toggleRightCol()" id="rightToggleBtn" title="收合回應欄">›</button>
+
+    <!-- LEFT SIDEBAR -->
+    <nav class="left-col col-divider" id="leftSidebar">
+      <button class="col-toggle-btn left-col-toggle" onclick="toggleLeftCol()" id="leftToggleBtn" title="收合側欄">‹</button>
+      <div class="left-col-content" id="leftColContent">
+        <button class="nav-home-btn active" id="homeNavBtn" onclick="goHome()">🏠 Home</button>
+        <div class="nav-section-label">Months</div>
+        <div id="monthPillList"></div>
+        <button class="month-add-btn" onclick="openEmojiPicker()">+ 新增月份</button>
+      </div>
+    </nav>
+
+    <!-- MID CONTENT -->
+    <div class="mid-col">
+      <!-- Home page view -->
+      <div class="page-view active" id="homeView">
+        <div class="home-page">
+          <div id="homeSetupBanner"></div>
+          <div class="home-section-title">Material 材料許願池</div>
+          <div class="book-list" id="bookListOverall"><div class="empty-state">許願池還空著</div></div>
+          <div class="add-row" style="margin-bottom:24px;">
+            <div class="field-group" style="flex:2;min-width:110px;"><div class="field-label">Title 標題</div><input type="text" id="bookTitleOverall" placeholder="書名、文章、影片..."></div>
+            <div class="field-group" style="flex:2;min-width:110px;"><div class="field-label">Description 簡短說明</div><input type="text" id="bookTypeOverall" placeholder="推薦原因..."></div>
+            <div class="field-group" style="flex:1;min-width:65px;"><div class="field-label">By 推薦人</div><input type="text" id="bookWhoOverall" placeholder="名字"></div>
+            <div class="field-group" style="flex:2;min-width:130px;"><div class="field-label">Link 連結</div><input type="text" id="bookLinkOverall" placeholder="https://..."></div>
+            <div class="field-group" style="min-width:130px;"><div class="field-label">Image 上傳圖片</div><label class="file-upload-btn" for="bookImgOverall"><span id="bookImgOverallLabel">選擇圖片</span></label><input type="file" id="bookImgOverall" accept="image/*" style="display:none;" onchange="updateFileLabel(this,'bookImgOverallLabel')"></div>
+            <button class="btn btn-sm" onclick="addBookOverall()">+ 加入</button>
+          </div>
+          <div class="home-section-title">Overall Topics 跨月總覽</div>
+          <div style="font-size:13px;color:var(--ink-light);padding:8px 0;">所有月份的閱讀關鍵字總覽</div>
+          <div id="overallTopics" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <!-- Month page view -->
+      <div class="page-view" id="monthView">
+        <div class="month-page" id="monthPageContent"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: wall -->
+    <div class="right-col">
+      <div class="right-col-label-wrap" style="padding:14px 18px 0;">
+        <div class="right-col-section-label" id="wallColLabel">Response 回應＆參考</div>
+      </div>
+      <div class="right-col-inner" style="margin-top:8px;">
+        <div class="wall-col-list" id="wallColList"><div class="empty-state">牆上還空著</div></div>
+      </div>
+      <div class="wall-form-area">
+        <div class="wall-tabs">
+          <button class="wall-tab-btn q-style active" onclick="setWallTab('q')">💬 Respond 回應</button>
+          <button class="wall-tab-btn link-style" onclick="setWallTab('link')">🖼 Reference 參考</button>
+        </div>
+        <div class="wall-panel active" id="wallPanelQ">
+          <div class="field-block"><div class="field-label">Response 回應內容</div><textarea id="wallQText" rows="2" placeholder=""></textarea></div>
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px;">
+            <div class="field-block" style="flex:1;max-width:140px;"><div class="field-label">Name 你的名字</div><input type="text" id="wallQWho" placeholder=""></div>
+            <button class="btn btn-green btn-sm" onclick="addWallQuestion()" style="flex-shrink:0;">+ 貼上提問</button>
+          </div>
+        </div>
+        <div class="wall-panel" id="wallPanelLink">
+          <div class="field-block"><div class="field-label">Title 標題</div><input type="text" id="wallTitle" placeholder=""></div>
+          <div class="field-block"><div class="field-label">Description 簡短說明</div><textarea id="wallDesc" rows="2" placeholder=""></textarea></div>
+          <div class="field-block"><div class="field-label">Link 連結</div><input type="text" id="wallUrl" placeholder="https://..."></div>
+          <div class="field-block"><div class="field-label">Image 上傳圖片</div><label class="file-upload-btn" for="wallImg"><span id="wallImgLabel">選擇圖片</span></label><input type="file" id="wallImg" accept="image/*" style="display:none;" onchange="updateFileLabel(this,'wallImgLabel')"></div>
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px;">
+            <div class="field-block" style="flex:1;max-width:140px;"><div class="field-label">Name 你的名字</div><input type="text" id="wallLinkWho" placeholder=""></div>
+            <button class="btn btn-sm" style="background:var(--face-yellow);color:#6b4d00;flex-shrink:0;" onclick="addWallRef()">+ 加入參考</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBMIT PAGE (2b) — full-width overlay inside frame -->
+  <div class="submit-page" id="submitPage">
+    <div class="submit-main">
+      <div class="submit-top-bar">
+        <button class="submit-back-btn" onclick="exitSubmit()">← 返回</button>
+        <span class="submit-month-label" id="submitMonthLabel">August 2026 · 報告人提交</span>
+      </div>
+      <div class="submit-kw-row" id="submitKwRow"></div>
+
+      <div class="step-block">
+        <div class="step-num">01</div>
+        <div class="step-title">Material 材料</div>
+        <div class="field-block">
+          <div class="field-label">Title 標題</div>
+          <input type="text" id="ncTitle" placeholder="" oninput="updatePreview()">
+        </div>
+        <div style="margin-bottom:12px;">
+          <div class="field-label" style="margin-bottom:7px;">Type 類型</div>
+          <div class="type-pills" id="typePills">
+            <button class="type-pill" onclick="selectType('書')">書</button>
+            <button class="type-pill" onclick="selectType('論文')">論文</button>
+            <button class="type-pill" onclick="selectType('影像')">影像</button>
+            <button class="type-pill" onclick="selectType('其他')">其他</button>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-block">
+            <div class="field-label">Link 連結</div>
+            <input type="text" id="ncRefUrl" placeholder="https://...">          </div>
+          <div class="field-block">
+            <div class="field-label">Presenter 報告人</div>
+            <input type="text" id="ncAuthor" placeholder="" oninput="updatePreview()">
+          </div>
+        </div>
+        <div class="field-block">
+          <div class="field-label">Cover Image 上傳封面 / 截圖（可多張）</div>
+          <label class="file-upload-btn" for="ncRefImg"><span id="ncRefImgLabel">選擇圖片</span></label>
+          <input type="file" id="ncRefImg" accept="image/*" multiple style="display:none;" onchange="updateFileLabel(this,'ncRefImgLabel')">
+        </div>
+        <div class="field-block">
+          <div class="field-label">Keywords 關鍵字（逗號分隔）</div>
+          <input type="text" id="ncKeywords" placeholder="" oninput="updatePreview()">
+        </div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-num">02</div>
+        <div class="step-title">Reinterpretation 解讀</div>
+        <div class="field-block bordered-summary">
+          <div class="field-label">What is it saying? 這份材料在說什麼？</div>
+          <textarea id="ncSum1" rows="3" placeholder="支援 Markdown：**重點**、- 條列..."></textarea>
+        </div>
+        <div class="field-block bordered-summary">
+          <div class="field-label">Relation to the topic? 與研究主題的關係？</div>
+          <textarea id="ncSum2" rows="3" placeholder=""></textarea>
+        </div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-num">03</div>
+        <div class="step-title">Speculation 轉化想像 <span class="step-progress" id="speculationProgress">必填 · 0 / 4 已回答</span></div>
+        <div class="field-block bordered-imagination">
+          <div class="field-label">Into what device or scene? 轉化成什麼裝置 / 場景？</div>
+          <textarea id="ncImag1" rows="3" placeholder="" oninput="updateSpecProgress()"></textarea>
+        </div>
+        <div class="field-block bordered-imagination">
+          <div class="field-label">Who uses it? Who is excluded? 誰在使用？誰被排除？</div>
+          <textarea id="ncImag2" rows="3" placeholder="" oninput="updateSpecProgress()"></textarea>
+        </div>
+        <div class="field-block bordered-imagination">
+          <div class="field-label">What materials or tests? 需要什麼材料、測試？</div>
+          <textarea id="ncImag3" rows="3" placeholder="" oninput="updateSpecProgress()"></textarea>
+        </div>
+        <div class="field-block bordered-imagination">
+          <div class="field-label">Ethical risks? 倫理風險？</div>
+          <textarea id="ncImag4" rows="3" placeholder="" oninput="updateSpecProgress()"></textarea>
+        </div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-num">04</div>
+        <div class="step-title">Open note 也可以留言給大家</div>
+        <div class="field-block">
+          <div class="field-label">The questions you'd like to discuss 想在讀書會上一起討論的問題</div>
+          <textarea id="ncOpenNote" rows="4" placeholder=""></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit sidebar: progress + card preview -->
+    <div class="submit-sidebar">
+      <div class="submit-actions">
+        <button class="btn btn-ghost btn-sm" onclick="saveDraft()">Save Draft 存成草稿</button>
+        <button class="btn btn-dark" onclick="submitCard()">Submit 送出本月材料 →</button>
+      </div>
+      <div>
+        <div class="preview-label">Progress 送出進度</div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px;">Material · Reinterpretation · Speculation</div>
+        <div style="font-size:11px;color:var(--ink-light);">Auto-saved 草稿自動儲存</div>
+      </div>
+      <div>
+        <div class="preview-label">Preview 小卡預覽</div>
+        <div class="card-preview-box" id="cardPreviewBox">
+          <div class="preview-header">
+            <div class="preview-title" id="previewTitle">（請填入標題）</div>
+            <div class="preview-meta" id="previewMeta">—</div>
+            <div class="preview-kws" id="previewKws"></div>
+          </div>
+          <div class="preview-body" id="previewBody">填寫材料後，這裡會即時顯示卡片預覽。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="loadingOverlay" class="loading-overlay" style="display:none;">
+  <div class="loading-box"><div class="loading-spinner"></div><div class="loading-text" id="loadingText">載入中...</div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// Firebase loaded via dynamic import to allow onclick handlers to work
+const _fbPromise = Promise.all([
+  import("https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js"),
+  import("https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js")
+]).then(([{initializeApp},{getDatabase,ref,set,get,push,remove,onValue,update}])=>{
+  const firebaseConfig = {
+    apiKey: "AIzaSyCscuSn9Rp2D67NWVDG4R8VXCNkpWECIYM",
+    authDomain: "crc-research-board.firebaseapp.com",
+    databaseURL: "https://crc-research-board-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "crc-research-board",
+    storageBucket: "crc-research-board.firebasestorage.app",
+    messagingSenderId: "1067703524355",
+    appId: "1:1067703524355:web:25b77e37d9f09417a68236"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  window._fb = {
+    fbGet: async(path)=>{ const snap=await get(ref(db,path)); return snap.exists()?snap.val():null; },
+    fbSet: async(path,val)=>set(ref(db,path),val),
+    fbUpdate: async(path,val)=>update(ref(db,path),val),
+    fbPush: async(path,val)=>push(ref(db,path),val),
+    fbRemove: async(path)=>remove(ref(db,path)),
+    fbListen: (path,cb)=>onValue(ref(db,path),snap=>cb(snap.exists()?snap.val():null))
+  };
+  // Now load main app
+  refreshFloatingEmojis();
+  loadAllData();
+  initResponsive();
+});
+
+const MONTH_SEQUENCE = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const EMOJI_PICKER_OPTIONS = ['😊','😄','🙂','😎','🤩','😺','😼','🥳','😇','🤖','👽','🦄','🐙','🌙','⭐','✦','◉','🔥','🌈','💫','👾','🛸','🪐','🧬','🫧'];
+const FACES = ['😊','😄','🙂','😎','🤩','😺','✦','◉'];
+const FACE_COLORS = ['#6FE6A0','#F178C2','#FF8A4C','#5BB8F5','#B187F5','#FFD23F','#FF6B5B'];
+const CARD_EMOJIS = ['🔬','💡','⚡','🌐','🎞️','📡','🌿','🔮','🦾','🛰️'];
+const STICKER_POSITIONS = [{top:'8%',left:'4%'},{top:'18%',left:'92%'},{top:'42%',left:'2%'},{top:'58%',left:'95%'},{top:'78%',left:'6%'},{top:'88%',left:'90%'},{top:'30%',left:'97%'},{top:'66%',left:'1%'}];
+
+const defaultMonths = [
+  {id:'june',label:'June',emoji:'😊',questions:['','',''],reading:[]},
+  {id:'july',label:'July',emoji:'😄',questions:['','',''],reading:[]},
+  {id:'august',label:'August',emoji:'🙂',questions:['','',''],reading:[]}
+];
+
+let monthDefs = defaultMonths.map(m=>({...m,questions:[...m.questions],reading:[...m.reading]}));
+const data = {};
+let overallBooks = [];
+const bookWalls = {}; // book id → [{id, who, text}]
+let activeMonth = null; // null = home
+let activeWallTab = 'q';
+let submitForMonth = null;
+let selectedType = '';
+
+monthDefs.forEach(m=>{ data[m.id]={cards:[],wall:[]}; });
+
+function ensureMonthData(mid){ if(!data[mid]) data[mid]={cards:[],wall:[]}; }
+function renderMd(text){ if(!text) return ''; try{ return marked.parse(text); }catch(e){ return text.replace(/\n/g,'<br>'); } }
+function parseImgList(val){ if(!val) return []; try{ const p=JSON.parse(val); return Array.isArray(p)?p:[val]; }catch(e){ return val?[val]:[]; } }
+
+// ── API ──
+// ── FIREBASE HELPERS (proxy to window._fb set after dynamic import) ──
+function waitFb(){ return new Promise(resolve=>{ const t=setInterval(()=>{ if(window._fb){clearInterval(t);resolve();} },50); }); }
+async function fbGet(path){ await waitFb(); return window._fb.fbGet(path); }
+async function fbSet(path,val){ await waitFb(); return window._fb.fbSet(path,val); }
+async function fbUpdate(path,val){ await waitFb(); return window._fb.fbUpdate(path,val); }
+async function fbPush(path,val){ await waitFb(); return window._fb.fbPush(path,val); }
+async function fbRemove(path){ await waitFb(); return window._fb.fbRemove(path); }
+function fbListen(path,cb){ const t=setInterval(()=>{ if(window._fb){clearInterval(t);window._fb.fbListen(path,cb);} },50); }
+function showLoading(msg='載入中...'){ document.getElementById('loadingText').textContent=msg; document.getElementById('loadingOverlay').style.display='flex'; }
+function hideLoading(){ document.getElementById('loadingOverlay').style.display='none'; }
+const debounceTimers={};
+function debounce(key,fn,delay=900){ clearTimeout(debounceTimers[key]); debounceTimers[key]=setTimeout(fn,delay); }
+
+// ── LOAD DATA (Firebase real-time listeners) ──
+async function loadAllData(){
+  showLoading('連接 Firebase...');
+  try {
+    // ── months ──
+    fbListen('months', val => {
+      if(val){
+        const arr = Object.entries(val).map(([id,m])=>({
+          id, label:m.label||id, emoji:m.emoji||'😊',
+          questions:m.questions||['','',''],
+          reading:m.reading||[]
+        })).sort((a,b)=>(a.order||0)-(b.order||0));
+        if(arr.length) monthDefs = arr;
+      }
+      monthDefs.forEach(m=>ensureMonthData(m.id));
+      refreshFloatingEmojis();
+      renderSidebar();
+      renderOverallTopics();
+      if(activeMonth) renderMonthPage(activeMonth);
+    });
+
+    // ── books ──
+    fbListen('books', val => {
+      overallBooks = val ? Object.entries(val).map(([fbKey,b])=>({
+        fbKey, id:fbKey, title:b.title||'', type:b.type||'', who:b.who||'',
+        link:b.link||'', img:b.img||''
+      })) : [];
+      renderBooksOverall();
+    });
+
+    // ── cards ──
+    fbListen('cards', val => {
+      monthDefs.forEach(m=>{ if(data[m.id]) data[m.id].cards=[]; });
+      if(val){
+        Object.entries(val).forEach(([fbKey,c])=>{
+          if(!data[c.month]) data[c.month]={cards:[],wall:[]};
+          const existing = data[c.month].cards.find(x=>x.fbKey===fbKey);
+          const card = {
+            fbKey, id:fbKey, title:c.title||'', author:c.author||'', date:c.date||'',
+            time:c.time||'', editedAt:c.editedAt||'', sum1:c.sum1||'', sum2:c.sum2||'',
+            imag1:c.imag1||'', imag2:c.imag2||'', imag3:c.imag3||'', imag4:c.imag4||'',
+            openNote:c.openNote||'', refUrl:c.refUrl||'', refImgs:parseImgList(c.refImg),
+            keywords:c.keywords?c.keywords.split(',').filter(Boolean):[], type:c.type||'',
+            expanded:existing?.expanded||false, openSummary:existing?.openSummary??true,
+            openImagination:existing?.openImagination||false, openReference:existing?.openReference||false
+          };
+          data[c.month].cards.push(card);
+        });
+      }
+      if(activeMonth) renderCardList(activeMonth);
+      renderSidebar();
+    });
+
+    // ── wall ──
+    fbListen('wall', val => {
+      monthDefs.forEach(m=>{ if(data[m.id]) data[m.id].wall=[]; });
+      if(val){
+        Object.entries(val).forEach(([fbKey,w])=>{
+          if(!data[w.month]) data[w.month]={cards:[],wall:[]};
+          data[w.month].wall.push({fbKey,id:fbKey,type:w.type,who:w.who||'匿名',text:w.text||'',title:w.title||'',desc:w.desc||'',url:w.url||'',imgSrc:w.imgSrc||''});
+        });
+      }
+      renderWallCol();
+    });
+
+    // ── bookWalls ──
+    fbListen('bookWalls', val => {
+      if(val){
+        Object.entries(val).forEach(([bookId, items])=>{
+          bookWalls[bookId] = Object.entries(items).map(([fbKey,r])=>({fbKey,id:fbKey,...r}));
+        });
+      }
+      renderBooksOverall();
+      if(selectedBookId) renderBookResponses(selectedBookId);
+    });
+
+    hideLoading();
+    toast('✦ Firebase 連接成功！');
+  } catch(e) {
+    hideLoading();
+    toastError('⚠️ Firebase 連接失敗');
+    console.error(e);
+  }
+}
+
+function renderAll(){
+  refreshFloatingEmojis();
+  renderSidebar();
+  renderBooksOverall();
+  renderOverallTopics();
+  renderWallCol();
+}
+
+// ── FLOATING STICKERS ──
+function refreshFloatingEmojis(){
+  const wrap=document.getElementById('faceStickers'); if(!wrap) return;
+  wrap.innerHTML='';
+  const custom=monthDefs.map(m=>m.emoji).filter(Boolean);
+  const pool=[...new Set([...custom,...FACES])];
+  STICKER_POSITIONS.forEach((pos,i)=>{
+    const el=document.createElement('div'); el.className='face-sticker';
+    el.textContent=pool[i%pool.length]; el.style.top=pos.top; el.style.left=pos.left;
+    el.style.color=FACE_COLORS[i%FACE_COLORS.length]; el.style.animationDuration=(10+i*2.3)+'s'; el.style.animationDelay=(i*0.6)+'s';
+    wrap.appendChild(el);
+  });
+}
+
+// ── SIDEBAR ──
+function renderSidebar(){
+  const list=document.getElementById('monthPillList');
+  list.innerHTML=monthDefs.map(m=>{
+    const count=(data[m.id]&&data[m.id].cards.length)||0;
+    const kwHtml=m.reading.length?`<div class="month-kw-row">${m.reading.slice(0,4).join(' · ')}</div>`:'';
+    return `<div class="month-pill-wrap">
+      <button class="month-pill${activeMonth===m.id?' active':''}" onclick="goMonth('${m.id}')">
+        <span class="face-badge" style="color:${FACE_COLORS[monthDefs.indexOf(m)%FACE_COLORS.length]};">${m.emoji}</span>${m.label}${count?` <span class="month-count">(${count})</span>`:''}
+      </button>
+      <button class="month-pill-del" onclick="deleteMonth('${m.id}',event)" title="刪除月份">×</button>
+      ${kwHtml}
+    </div>`;
+  }).join('');
+  document.getElementById('homeNavBtn').classList.toggle('active',activeMonth===null);
+}
+
+// ── NAVIGATION ──
+function goHome(){
+  activeMonth=null;
+  selectedBookId=null;
+  document.getElementById('homeView').classList.add('active');
+  document.getElementById('monthView').classList.remove('active');
+  exitSubmitView();
+  renderSidebar();
+  renderBooksOverall();
+  renderOverallTopics();
+  renderWallCol();
+  if(isMobile()) setMobileTab('main');
+}
+function goMonth(mid){
+  activeMonth=mid;
+  ensureMonthData(mid);
+  document.getElementById('homeView').classList.remove('active');
+  document.getElementById('monthView').classList.add('active');
+  exitSubmitView();
+  renderSidebar();
+  renderMonthPage(mid);
+  renderWallCol();
+  if(isMobile()) setMobileTab('main');
+}
+function enterSubmit(mid){
+  submitForMonth=mid;
+  const m=monthDefs.find(x=>x.id===mid);
+  document.getElementById('mainThreeCol').style.display='none';
+  document.getElementById('submitPage').classList.add('active');
+  document.getElementById('submitMonthLabel').textContent=`${m.label} · 報告人提交`;
+  document.getElementById('submitKwRow').innerHTML=m.reading.map(r=>`<span class="submit-kw">${r}</span>`).join('');
+  clearSubmitForm();
+  updatePreview();
+}
+function exitSubmit(){
+  submitForMonth=null;
+  document.getElementById('mainThreeCol').style.display='';
+  document.getElementById('submitPage').classList.remove('active');
+  if(activeMonth) renderMonthPage(activeMonth);
+}
+function exitSubmitView(){ document.getElementById('mainThreeCol').style.display=''; document.getElementById('submitPage').classList.remove('active'); }
+
+// ── MONTH PAGE ──
+function renderMonthPage(mid){
+  const m=monthDefs.find(x=>x.id===mid); if(!m) return;
+  const cards=(data[mid]&&data[mid].cards)||[];
+  document.getElementById('monthPageContent').innerHTML=`
+    <div class="month-band">
+      <div class="month-band-top">
+        <div class="month-band-name">${m.emoji} ${m.label}</div>
+        <div class="month-band-stats">${cards.length} 份材料</div>
+        <div style="flex:1;"></div>
+        <span class="save-indicator" id="saveInd-${mid}">✓ 已儲存</span>
+      </div>
+      <div>
+        <div class="kw-area" id="reading-${mid}"></div>
+      </div>
+      <div class="core-qs">
+        ${m.questions.map((q,i)=>`<div class="core-q-row">
+          <span class="core-q-num">${i+1}</span>
+          <textarea class="core-q-input" rows="2" oninput="onMonthQInput('${mid}',${i},this.value)">${q}</textarea>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="materials-area">
+      <div class="materials-header">
+        <div class="materials-label">Materials 本月材料</div>
+        <div class="materials-count">${cards.length} 份</div>
+      </div>
+      <div class="card-list" id="cardList-${mid}"></div>
+      <button class="add-card-cta" onclick="enterSubmit('${mid}')">
+        <span style="font-size:18px;">+</span>
+        <span>+ share my materials 提交我的材料 →</span>
+      </button>
+    </div>`;
+  renderReadingTags(mid);
+  renderCardList(mid);
+}
+
+function onMonthQInput(mid,i,val){
+  monthDefs.find(x=>x.id===mid).questions[i]=val;
+  debounce('month-'+mid,()=>saveMonth(mid));
+}
+async function saveMonth(mid){
+  const m=monthDefs.find(x=>x.id===mid); if(!m) return;
+  const order=monthDefs.findIndex(x=>x.id===mid);
+  const indEl=document.getElementById(`saveInd-${mid}`);
+  try{
+    await fbSet(`months/${mid}`,{label:m.label,emoji:m.emoji||'',order,questions:m.questions,reading:m.reading});
+    if(indEl){indEl.textContent='✓ 已儲存';indEl.classList.add('show');setTimeout(()=>indEl.classList.remove('show'),1500);}
+  }catch(e){toastError('⚠️ 月份儲存失敗');console.error(e);}
+}
+
+// ── READING TAGS ──
+let editingTag=null;
+function renderReadingTags(mid){
+  const m=monthDefs.find(x=>x.id===mid);
+  const el=document.getElementById('reading-'+mid); if(!el||!m) return;
+  const RTAG_COLORS=['#D9F7E6','#FDE0F0','#FFE3D1','#DCEEFD','#EDE3FF','#FFF1C2','#FFE0DC'];
+  el.innerHTML=`<span class="kw-label">Keywords 關鍵字</span>`+
+    m.reading.map((r,i)=>{
+      const color=RTAG_COLORS[i%RTAG_COLORS.length];
+      const isEditing=editingTag&&editingTag.mid===mid&&editingTag.index===i;
+      if(isEditing) return `<span class="rtag rtag-editing">
+        <input type="text" id="rtag-input-${mid}-${i}" value="${r.replace(/"/g,'&quot;')}"
+          style="font-size:11px;color:var(--ink);background:white;border:none;border-radius:6px;padding:1px 5px;width:${Math.max(r.length,8)}ch;outline:none;font-family:'Noto Sans TC',sans-serif;"
+          onkeydown="if(event.key==='Enter'){saveRTag('${mid}',${i});}if(event.key==='Escape'){cancelRTag();}">
+        <button class="rtag-icon-btn" onclick="saveRTag('${mid}',${i})" style="color:#1B8A50;">✓</button>
+        <button class="rtag-icon-btn" onclick="cancelRTag()" style="opacity:0.6;">✕</button>
+      </span>`;
+      return `<span class="rtag" style="background:${color};">${r}
+        <button class="rtag-icon-btn" onclick="startEditRTag('${mid}',${i})" style="opacity:0.5;">✎</button>
+        <button class="rtag-icon-btn" onclick="removeRTag('${mid}',${i})">×</button>
+      </span>`;
+    }).join('')+`<span class="rtag rtag-add" onclick="addRTag('${mid}')">+ 新增</span>`;
+  if(editingTag&&editingTag.mid===mid){
+    const inp=document.getElementById(`rtag-input-${mid}-${editingTag.index}`);
+    if(inp){inp.focus();inp.select();}
+  }
+}
+function startEditRTag(mid,i){editingTag={mid,index:i};renderReadingTags(mid);}
+function saveRTag(mid,i){const inp=document.getElementById(`rtag-input-${mid}-${i}`);const v=inp?inp.value.trim():'';if(v) monthDefs.find(x=>x.id===mid).reading[i]=v;editingTag=null;renderReadingTags(mid);saveMonth(mid);renderSidebar();}
+function cancelRTag(){const mid=editingTag?editingTag.mid:null;editingTag=null;if(mid) renderReadingTags(mid);}
+function removeRTag(mid,i){if(editingTag&&editingTag.mid===mid) editingTag=null;monthDefs.find(x=>x.id===mid).reading.splice(i,1);renderReadingTags(mid);saveMonth(mid);renderSidebar();}
+function addRTag(mid){monthDefs.find(x=>x.id===mid).reading.push('new keyword');const ni=monthDefs.find(x=>x.id===mid).reading.length-1;editingTag={mid,index:ni};renderReadingTags(mid);saveMonth(mid);renderSidebar();}
+
+// ── CARD LIST (horizontal) ──
+function renderCardList(mid){
+  const el=document.getElementById(`cardList-${mid}`); if(!el) return;
+  const cards=(data[mid]&&data[mid].cards)||[];
+  if(!cards.length){el.innerHTML='';return;}
+  el.innerHTML=cards.map((c,ci)=>{
+    const emo=CARD_EMOJIS[ci%CARD_EMOJIS.length];
+    const thumbHtml=c.refImgs&&c.refImgs.length?`<img src="${c.refImgs[0]}" style="width:100%;height:100%;object-fit:cover;">`:`<span>${emo}</span>`;
+    return `<div class="card-row${c.expanded?' expanded':''}" id="cardRow-${c.id}">
+      <div class="card-row-main" onclick="toggleCardExpand('${mid}',${c.id})">
+        <div class="card-row-thumb">${thumbHtml}</div>
+        <div class="card-row-info">
+          <div class="card-row-title">${c.title}</div>
+          <div class="card-row-meta">${c.author} · ${c.date} ${c.time}${c.type?` · ${c.type}`:''}</div>
+          <div class="card-row-kws">${c.keywords.map(k=>`<span class="card-row-kw">#${k}</span>`).join('')}</div>
+        </div>
+        <div class="card-row-actions">
+          <span class="card-expand-chevron${c.expanded?' open':''}">▼</span>
+        </div>
+      </div>
+      <div class="card-detail">
+        <div class="card-detail-tabs-bar">
+          <button class="detail-tab tab-summary${c.openSummary?' open':''}" onclick="toggleDetailTab('${mid}',${c.id},'Summary')">
+            <span class="detail-tab-label">SUMMARY</span><span class="detail-tab-chevron${c.openSummary?' open':''}">▾</span>
+          </button>
+          <button class="detail-tab tab-imagination${c.openImagination?' open':''}" onclick="toggleDetailTab('${mid}',${c.id},'Imagination')">
+            <span class="detail-tab-label">SPECULATION</span><span class="detail-tab-chevron${c.openImagination?' open':''}">▾</span>
+          </button>
+          <button class="detail-tab tab-reference${c.openReference?' open':''}" onclick="toggleDetailTab('${mid}',${c.id},'Reference')">
+            <span class="detail-tab-label">OPEN NOTE</span><span class="detail-tab-chevron${c.openReference?' open':''}">▾</span>
+          </button>
+          <div style="flex:1;"></div>
+          <button class="btn btn-ghost btn-sm" style="margin:6px 8px;" onclick="deleteCard('${mid}',${c.id})">刪除</button>
+        </div>
+        <div class="detail-section ds-summary${c.openSummary?' open':''}">
+          <div class="d-grid">
+            <div><div class="d-label">這份材料在說什麼？</div><div class="d-val markdown-body${c.sum1?'':' empty'}">${c.sum1?renderMd(c.sum1):'尚未填寫'}</div></div>
+            <div><div class="d-label">與研究主題的關係？</div><div class="d-val markdown-body${c.sum2?'':' empty'}">${c.sum2?renderMd(c.sum2):'尚未填寫'}</div></div>
+          </div>
+        </div>
+        <div class="detail-section ds-imagination${c.openImagination?' open':''}">
+          <div class="d-grid">
+            <div><div class="d-label green">轉化成什麼裝置／場景？</div><div class="d-val green markdown-body${c.imag1?'':' empty'}">${c.imag1?renderMd(c.imag1):'尚未填寫'}</div></div>
+            <div><div class="d-label green">誰在使用？誰被排除？</div><div class="d-val green markdown-body${c.imag2?'':' empty'}">${c.imag2?renderMd(c.imag2):'尚未填寫'}</div></div>
+            <div><div class="d-label green">需要什麼材料、測試？</div><div class="d-val green markdown-body${c.imag3?'':' empty'}">${c.imag3?renderMd(c.imag3):'尚未填寫'}</div></div>
+            <div><div class="d-label green">倫理風險？</div><div class="d-val green markdown-body${c.imag4?'':' empty'}">${c.imag4?renderMd(c.imag4):'尚未填寫'}</div></div>
+          </div>
+        </div>
+        <div class="detail-section ds-reference${c.openReference?' open':''}">
+          ${c.refImgs&&c.refImgs.length?`<div class="ref-img-gallery">${c.refImgs.map(img=>`<img src="${img}" class="ref-gallery-img">`).join('')}</div>`:''}
+          ${c.refUrl?`<a href="${c.refUrl}" target="_blank" style="font-size:12px;color:var(--orange);font-weight:600;margin-bottom:8px;display:block;">🔗 ${c.refUrl.length>50?c.refUrl.slice(0,50)+'…':c.refUrl}</a>`:''}
+          ${c.openNote?`<div class="d-val markdown-body">${renderMd(c.openNote)}</div>`:`<div class="d-val empty">尚未填寫</div>`}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleCardExpand(mid,id){
+  const c=data[mid].cards.find(c=>c.id===id); if(!c) return;
+  c.expanded=!c.expanded;
+  renderCardList(mid);
+}
+function toggleDetailTab(mid,id,sec){
+  const c=data[mid].cards.find(c=>c.id===id); if(!c) return;
+  const key='open'+sec; c[key]=!c[key];
+  renderCardList(mid);
+}
+async function deleteCard(mid,id){
+  const card=data[mid].cards.find(c=>c.id===id||c.fbKey===id);
+  const fbKey=card?.fbKey||id;
+  data[mid].cards=data[mid].cards.filter(c=>c.id!==id&&c.fbKey!==id);
+  renderCardList(mid); renderSidebar(); toast('已刪除');
+  try{ await fbRemove(`cards/${fbKey}`); }catch(e){ toastError('⚠️ 刪除失敗'); }
+}
+
+// ── SUBMIT FORM (2b) ──
+function selectType(t){
+  selectedType=t;
+  document.querySelectorAll('.type-pill').forEach(p=>p.classList.toggle('active',p.textContent===t));
+  updatePreview();
+}
+function updateSpecProgress(){
+  const count=[document.getElementById('ncImag1'),document.getElementById('ncImag2'),document.getElementById('ncImag3'),document.getElementById('ncImag4')].filter(el=>el&&el.value.trim()).length;
+  const el=document.getElementById('speculationProgress');
+  if(el) el.textContent=`必填 · ${count} / 4 已回答`;
+}
+function updatePreview(){
+  const title=document.getElementById('ncTitle')?.value.trim()||'（請填入標題）';
+  const author=document.getElementById('ncAuthor')?.value.trim()||'—';
+  const kws=(document.getElementById('ncKeywords')?.value||'').split(',').map(k=>k.trim()).filter(Boolean);
+  document.getElementById('previewTitle').textContent=title;
+  document.getElementById('previewMeta').textContent=`${author}${selectedType?' · '+selectedType:''}`;
+  document.getElementById('previewKws').innerHTML=kws.map(k=>`<span class="preview-kw">#${k}</span>`).join('');
+}
+function clearSubmitForm(){
+  ['ncTitle','ncAuthor','ncRefUrl','ncKeywords','ncSum1','ncSum2','ncImag1','ncImag2','ncImag3','ncImag4','ncOpenNote'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('ncRefImg').value='';
+  document.getElementById('ncRefImgLabel').textContent='選擇圖片';
+  selectedType='';
+  document.querySelectorAll('.type-pill').forEach(p=>p.classList.remove('active'));
+  updateSpecProgress();
+}
+function saveDraft(){ toast('草稿已儲存（本地暫存）'); }
+
+async function readFilesAsDataURLs(fileList){
+  const files=Array.from(fileList||[]);
+  return Promise.all(files.map(f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(f);})));
+}
+async function submitCard(){
+  const title=document.getElementById('ncTitle').value.trim();
+  if(!title) return toast('請填入材料標題！');
+  const mid=submitForMonth;
+  const kws=document.getElementById('ncKeywords').value.split(',').map(k=>k.trim()).filter(Boolean);
+  const now=new Date();
+  const date=now.toLocaleDateString('zh-TW');
+  const time=now.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  const author=document.getElementById('ncAuthor').value.trim()||'匿名';
+  const sum1=document.getElementById('ncSum1').value.trim();
+  const sum2=document.getElementById('ncSum2').value.trim();
+  const imag1=document.getElementById('ncImag1').value.trim();
+  const imag2=document.getElementById('ncImag2').value.trim();
+  const imag3=document.getElementById('ncImag3').value.trim();
+  const imag4=document.getElementById('ncImag4').value.trim();
+  const openNote=document.getElementById('ncOpenNote').value.trim();
+  const refUrl=document.getElementById('ncRefUrl').value.trim();
+  const refFiles=document.getElementById('ncRefImg').files;
+  const refImgs=await readFilesAsDataURLs(refFiles);
+  exitSubmit();
+  goMonth(mid);
+  toast('🃏 材料送出完成！');
+  try{
+    await fbPush('cards',{month:mid,title,author,date,time,editedAt:'',sum1,sum2,imag1,imag2,imag3,imag4,openNote,refUrl,refImg:JSON.stringify(refImgs),keywords:kws.join(','),type:selectedType});
+  }catch(e){ toastError('⚠️ 儲存失敗'); console.error(e); }
+}
+
+// ── WALL ──
+function setWallTab(tab){
+  activeWallTab=tab;
+  document.querySelectorAll('.wall-tab-btn.q-style').forEach(b=>b.classList.toggle('active',tab==='q'));
+  document.querySelectorAll('.wall-tab-btn.link-style').forEach(b=>b.classList.toggle('active',tab==='link'));
+  document.getElementById('wallPanelQ').classList.toggle('active',tab==='q');
+  document.getElementById('wallPanelLink').classList.toggle('active',tab==='link');
+}
+function renderWallCol(){
+  const mid=activeMonth;
+  const label=document.getElementById('wallColLabel');
+
+  if(!mid){
+    // Home: show book cards list for responding
+    if(label) label.textContent='Home · Response 回應＆參考';
+    const el=document.getElementById('wallColList'); if(!el) return;
+    if(!overallBooks.length){el.innerHTML='<div class="empty-state">許願池裡還沒有材料</div>';return;}
+    el.innerHTML=`<div style="font-size:11px;color:var(--ink-light);margin-bottom:10px;line-height:1.6;">選擇一份材料留下回應</div>`+
+      overallBooks.map(b=>`<div style="background:var(--card-bg);border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all 0.13s;border:1.5px solid transparent;" onmouseenter="this.style.borderColor='var(--orange)'" onmouseleave="this.style.borderColor='transparent'" onclick="selectBookForResponse(${b.id})">
+        <div style="font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:2px;">${b.title}</div>
+        <div style="font-size:10.5px;color:var(--ink-light);">✦ ${b.who}${b.type?' · '+b.type:''}</div>
+        ${(bookWalls[b.id]||[]).length?`<div style="font-size:10px;color:var(--orange);margin-top:4px;">💬 ${(bookWalls[b.id]||[]).length} 則回應</div>`:''}
+      </div>`).join('');
+  } else {
+    // Month: show wall items for this month
+    if(label) label.textContent=`${monthDefs.find(x=>x.id===mid)?.label||''} · Response 回應＆參考`;
+    const items=(data[mid]&&data[mid].wall)||[];
+    const el=document.getElementById('wallColList'); if(!el) return;
+    if(!items.length){el.innerHTML='<div class="empty-state">牆上還空著</div>';return;}
+    el.innerHTML=items.map(w=>{
+      if(w.type==='q') return `<div class="wall-col-item type-q"><div class="wall-col-body"><span class="wall-col-type type-q">提問</span><div class="wall-col-text">${renderMd(w.text)}</div><div class="wall-col-who">✦ ${w.who}</div></div><button class="wall-col-del" onclick="removeWallItem(${w.id})">×</button></div>`;
+      const thumbHtml=w.imgSrc?`<img class="wall-col-thumb" src="${w.imgSrc}" alt="${w.title}">`:w.url?`<div class="wall-col-placeholder">🔗</div>`:'';
+      return `<div class="wall-col-item type-link">${thumbHtml}<div class="wall-col-body"><span class="wall-col-type type-link">參考</span><div class="wall-col-title">${w.title}</div>${w.desc?`<div class="wall-col-desc">${w.desc}</div>`:''}${w.url?`<a href="${w.url}" target="_blank" class="wall-col-url">${w.url.length>30?w.url.slice(0,30)+'…':w.url}</a>`:''}<div class="wall-col-who">✦ ${w.who}</div></div><button class="wall-col-del" onclick="removeWallItem(${w.id})">×</button></div>`;
+    }).join('');
+  }
+}
+
+let selectedBookId = null;
+function selectBookForResponse(bookId){
+  toggleBookExpand(bookId);
+}
+function renderBookResponses(bookId){
+  const label=document.getElementById('wallColLabel');
+  const el=document.getElementById('wallColList'); if(!el) return;
+  const book=overallBooks.find(b=>b.id===bookId);
+  if(!book) return;
+  if(label) label.textContent=`${book.title.length>20?book.title.slice(0,20)+'…':book.title} · 回應＆參考`;
+  const responses=bookWalls[bookId]||[];
+  const respHtml=responses.length
+    ? responses.map(r=>{
+        if(r.type==='ref'){
+          const thumbHtml = r.imgSrc
+            ? `<img class="wall-col-thumb" src="${r.imgSrc}" alt="${r.title}">`
+            : (r.url ? `<div class="wall-col-placeholder">🔗</div>` : '');
+          return `<div class="wall-col-item type-link">
+            ${thumbHtml}
+            <div class="wall-col-body">
+              <span class="wall-col-type type-link">參考</span>
+              <div class="wall-col-title">${r.title||''}</div>
+              ${r.desc?`<div class="wall-col-desc">${r.desc}</div>`:''}
+              ${r.url?`<a href="${r.url}" target="_blank" class="wall-col-url">${r.url.length>30?r.url.slice(0,30)+'…':r.url}</a>`:''}
+              <div class="wall-col-who">✦ ${r.who}</div>
+            </div>
+            <button class="wall-col-del" onclick="removeBookWallItem(${bookId},${r.id})">×</button>
+          </div>`;
+        }
+        return `<div class="wall-col-item type-q">
+          <div class="wall-col-body">
+            <span class="wall-col-type type-q">回應</span>
+            <div class="wall-col-text">${r.text}</div>
+            <div class="wall-col-who">✦ ${r.who}</div>
+          </div>
+          <button class="wall-col-del" onclick="removeBookWallItem(${bookId},${r.id})">×</button>
+        </div>`;
+      }).join('')
+    : '<div class="empty-state">還沒有回應</div>';
+  el.innerHTML=`
+    <button onclick="clearBookSelection()" style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;color:var(--ink-light);background:none;border:none;cursor:pointer;margin-bottom:10px;padding:0;display:flex;align-items:center;gap:4px;">← 所有材料</button>
+    ${respHtml}`;
+}
+function clearBookSelection(){
+  selectedBookId=null;
+  renderBooksOverall();
+  renderWallCol();
+}
+async function removeBookWallItem(bookId,id){
+  if(bookWalls[bookId]) bookWalls[bookId]=bookWalls[bookId].filter(r=>r.id!==id&&r.fbKey!==id);
+  renderBooksOverall();
+  if(selectedBookId===bookId) renderBookResponses(bookId);
+  // find fbKey from original data
+  const fbKey = id; // id is already the fbKey from Firebase
+  try{ await fbRemove(`bookWalls/${bookId}/${fbKey}`); }catch(e){ toastError('⚠️ 刪除失敗'); }
+}
+async function addWallQuestion(){
+  if(!activeMonth && selectedBookId){
+    const text=document.getElementById('wallQText').value.trim(); if(!text) return toast('請填入回應內容！');
+    const who=document.getElementById('wallQWho').value.trim()||'匿名';
+    document.getElementById('wallQText').value=''; document.getElementById('wallQWho').value='';
+    toast('💬 回應加入！');
+    try{ await fbPush(`bookWalls/${selectedBookId}`,{who,text,type:'response'}); }catch(e){ toastError('⚠️ 儲存失敗'); }
+    return;
+  }
+  if(!activeMonth) return toast('請先選擇一份材料');
+  const text=document.getElementById('wallQText').value.trim(); if(!text) return toast('請填入提問內容！');
+  const who=document.getElementById('wallQWho').value.trim()||'匿名';
+  document.getElementById('wallQText').value=''; document.getElementById('wallQWho').value='';
+  toast('💬 提問貼上了！');
+  try{ await fbPush('wall',{month:activeMonth,type:'q',who,text,title:'',desc:'',url:'',imgSrc:''}); }catch(e){ toastError('⚠️ 儲存失敗'); }
+}
+
+async function addWallRef(){
+  const title=document.getElementById('wallTitle').value.trim();
+  const desc=document.getElementById('wallDesc').value.trim();
+  const url=document.getElementById('wallUrl').value.trim();
+  const who=document.getElementById('wallLinkWho').value.trim()||'匿名';
+  const file=document.getElementById('wallImg').files[0];
+  if(!title&&!url&&!file) return toast('請至少填寫標題、連結或圖片！');
+
+  const clearForm=()=>{
+    ['wallTitle','wallDesc','wallUrl','wallLinkWho'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('wallImg').value=''; document.getElementById('wallImgLabel').textContent='選擇圖片';
+  };
+
+  if(!activeMonth && selectedBookId){
+    const finish=async(imgSrc)=>{
+      clearForm(); toast('🖼 參考加入！');
+      try{ await fbPush(`bookWalls/${selectedBookId}`,{who,type:'ref',text:'',title:title||url||'參考資料',desc,url,imgSrc:imgSrc||''}); }catch(e){ toastError('⚠️ 儲存失敗'); }
+    };
+    if(file){const reader=new FileReader();reader.onload=e=>finish(e.target.result);reader.readAsDataURL(file);} else finish('');
+    return;
+  }
+  if(!activeMonth) return toast('請先選擇一份材料');
+
+  const finish=async(imgSrc)=>{
+    const type=imgSrc?'img':'link';
+    clearForm(); toast('🖼 參考加入！');
+    try{ await fbPush('wall',{month:activeMonth,type,who,text:'',title:title||url||'參考資料',desc,url,imgSrc:imgSrc||''}); }catch(e){ toastError('⚠️ 儲存失敗'); }
+  };
+  if(file){const reader=new FileReader();reader.onload=e=>finish(e.target.result);reader.readAsDataURL(file);} else finish('');
+}
+
+async function removeWallItem(id){
+  if(!activeMonth) return;
+  const item=data[activeMonth].wall.find(w=>w.id===id||w.fbKey===id);
+  const fbKey=item?.fbKey||id;
+  data[activeMonth].wall=data[activeMonth].wall.filter(w=>w.id!==id&&w.fbKey!==id);
+  renderWallCol();
+  try{ await fbRemove(`wall/${fbKey}`); }catch(e){ toastError('⚠️ 刪除失敗'); }
+}
+
+// ── BOOKS ──
+async function addBookOverall(){
+  const t=document.getElementById('bookTitleOverall').value.trim(); if(!t) return toast('請填入標題！');
+  const type=document.getElementById('bookTypeOverall').value.trim()||'其他';
+  const who=document.getElementById('bookWhoOverall').value.trim()||'匿名';
+  const link=document.getElementById('bookLinkOverall').value.trim();
+  const file=document.getElementById('bookImgOverall').files[0];
+  const finish=async(img)=>{
+    ['bookTitleOverall','bookTypeOverall','bookWhoOverall','bookLinkOverall'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('bookImgOverall').value=''; document.getElementById('bookImgOverallLabel').textContent='選擇圖片';
+    toast('許願池加入！');
+    try{ await fbPush('books',{title:t,type,who,link,img:img||''}); }catch(e){ toastError('⚠️ 儲存失敗'); }
+  };
+  if(file){const reader=new FileReader();reader.onload=e=>finish(e.target.result);reader.readAsDataURL(file);} else finish('');
+}
+async function removeBookOverall(id){
+  const book=overallBooks.find(b=>b.id===id||b.fbKey===id);
+  const fbKey=book?.fbKey||id;
+  overallBooks=overallBooks.filter(b=>b.id!==id&&b.fbKey!==id);
+  renderBooksOverall();
+  try{ await fbRemove(`books/${fbKey}`); }catch(e){ toastError('⚠️ 刪除失敗'); }
+}
+function renderBooksOverall(){
+  const el=document.getElementById('bookListOverall'); if(!el) return;
+  if(!overallBooks.length){el.innerHTML='<div class="empty-state">許願池還空著</div>';return;}
+  el.innerHTML=overallBooks.map((b,bi)=>{
+    const descFull = b.type||'';
+    const descShort = descFull.length > 30 ? descFull.slice(0,30)+'…' : descFull;
+    const respCount = (bookWalls[b.id]||[]).filter(r=>r.type==='response'||!r.type).length;
+    const refCount = (bookWalls[b.id]||[]).filter(r=>r.type==='ref').length;
+    const countBadge = [respCount?`💬 ${respCount}`:'', refCount?`🖼 ${refCount}`:''].filter(Boolean).join(' · ');
+    const isExpanded = selectedBookId===b.id;
+    const thumbHtml = b.img
+      ? `<img src="${b.img}" style="width:100%;height:100%;object-fit:cover;">`
+      : `<span>📚</span>`;
+    return `<div class="book-row${isExpanded?' expanded':''}" id="bookRow-${b.id}">
+      <div class="book-row-main" onclick="toggleBookExpand(${b.id})">
+        <div class="book-row-thumb">${thumbHtml}</div>
+        <div class="book-row-info">
+          <div class="book-row-title">${b.title}</div>
+          ${descFull?`<div class="book-row-desc">${isExpanded?descFull:descShort}</div>`:''}
+          <div class="book-row-meta">✦ ${b.who}${b.link?` · <a href="${b.link}" target="_blank" style="color:var(--orange);font-weight:600;text-decoration:none;" onclick="event.stopPropagation()">🔗 開啟</a>`:''}</div>
+        </div>
+        <div class="book-row-actions">
+          ${countBadge?`<span class="book-row-resp-badge">${countBadge}</span>`:''}
+          <span class="book-expand-chevron${isExpanded?' open':''}">▼</span>
+          <button class="del-btn" style="position:static;margin-left:2px;" onclick="event.stopPropagation();removeBookOverall(${b.id})">×</button>
+        </div>
+      </div>
+      <div class="book-detail">
+        ${descFull?`<div style="font-size:13px;color:var(--ink);line-height:1.7;margin-bottom:8px;">${descFull}</div>`:''}
+        ${b.link?`<a href="${b.link}" target="_blank" style="font-size:12px;color:var(--orange);font-weight:600;text-decoration:none;">🔗 ${b.link.length>50?b.link.slice(0,50)+'…':b.link}</a>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleBookExpand(bookId){
+  if(selectedBookId===bookId){
+    // collapse — deselect
+    selectedBookId=null;
+    renderBooksOverall();
+    renderWallCol(); // back to book list in right col
+  } else {
+    selectedBookId=bookId;
+    renderBooksOverall();
+    renderBookResponses(bookId); // right col shows this book's responses
+  }
+}
+function renderOverallTopics(){
+  const el=document.getElementById('overallTopics'); if(!el) return;
+  const RTAG_COLORS=['#D9F7E6','#FDE0F0','#FFE3D1','#DCEEFD','#EDE3FF','#FFF1C2','#FFE0DC'];
+  // build map: keyword → first month that has it
+  const kwMonthMap={};
+  monthDefs.forEach(m=>{ m.reading.forEach(r=>{ if(!kwMonthMap[r]) kwMonthMap[r]=m.id; }); });
+  const allKws=[...new Set(monthDefs.flatMap(m=>m.reading))];
+  if(!allKws.length){ el.innerHTML='<div style="font-size:12px;color:var(--ink-faint);">各月份的關鍵字會顯示在這裡</div>'; return; }
+  el.innerHTML=allKws.map((r,i)=>{
+    const mid=kwMonthMap[r];
+    const monthLabel=monthDefs.find(x=>x.id===mid)?.label||'';
+    return `<span
+      title="前往 ${monthLabel}"
+      onclick="goMonth('${mid}')"
+      style="font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;
+        background:${RTAG_COLORS[i%RTAG_COLORS.length]};color:var(--ink);
+        cursor:pointer;transition:all 0.13s;display:inline-block;"
+      onmouseenter="this.style.opacity='0.75';this.style.transform='translateY(-1px)'"
+      onmouseleave="this.style.opacity='1';this.style.transform=''"
+    >${r}</span>`;
+  }).join('');
+}
+
+// ── MONTH ADD/DELETE ──
+function nextMonthLabel(){ if(!monthDefs.length) return 'January'; const last=monthDefs[monthDefs.length-1].label; const idx=MONTH_SEQUENCE.indexOf(last); if(idx===-1) return 'New Month'; return MONTH_SEQUENCE[(idx+1)%12]; }
+function openEmojiPicker(){ const label=nextMonthLabel(); const overlay=document.createElement('div'); overlay.className='modal-overlay'; overlay.id='emojiPickerOverlay'; overlay.innerHTML=`<div class="modal-box"><div class="modal-title">新增「${label}」</div><div class="modal-sub">幫這個月選一個代表 Emoji</div><div class="emoji-grid">${EMOJI_PICKER_OPTIONS.map(e=>`<button class="emoji-option" onclick="confirmAddMonth('${label}','${e}')">${e}</button>`).join('')}</div><button class="btn btn-ghost btn-sm" style="margin-top:14px;" onclick="closeModal('emojiPickerOverlay')">取消</button></div>`; document.body.appendChild(overlay); }
+function closeModal(id){ const el=document.getElementById(id); if(el) el.remove(); }
+async function confirmAddMonth(label,emoji){
+  closeModal('emojiPickerOverlay');
+  const id=label.toLowerCase()+'-'+Date.now();
+  const order=monthDefs.length;
+  refreshFloatingEmojis(); toast(`已新增 ${emoji} ${label}！`);
+  try{ await fbSet(`months/${id}`,{label,emoji,order,questions:['','',''],reading:[]}); }
+  catch(e){ toastError('⚠️ 新增月份儲存失敗'); console.error(e); }
+}
+function deleteMonth(mid,evt){ if(evt) evt.stopPropagation(); if(monthDefs.length<=1){toast('⚠️ 至少要保留一個月份');return;} const m=monthDefs.find(x=>x.id===mid); if(!m) return; const overlay=document.createElement('div'); overlay.className='modal-overlay'; overlay.id='deleteConfirmOverlay'; overlay.innerHTML=`<div class="modal-box"><div class="modal-title">刪除「${m.emoji||''} ${m.label}」？</div><div class="modal-sub">這個月份的所有 Research Cards 與牆面內容都會一併刪除，無法復原。</div><div style="display:flex;gap:8px;margin-top:16px;justify-content:center;"><button class="btn btn-ghost btn-sm" onclick="closeModal('deleteConfirmOverlay')">取消</button><button class="btn btn-sm" style="background:#FF6B5B;" onclick="confirmDeleteMonth('${mid}')">確定刪除</button></div></div>`; document.body.appendChild(overlay); }
+async function confirmDeleteMonth(mid){
+  closeModal('deleteConfirmOverlay');
+  const m=monthDefs.find(x=>x.id===mid); if(!m) return;
+  if(activeMonth===mid){activeMonth=null;goHome();}else{renderSidebar();}
+  refreshFloatingEmojis(); toast(`已刪除 ${m.label}`);
+  try{ await fbRemove(`months/${mid}`); }
+  catch(e){ toastError('⚠️ 刪除同步失敗'); }
+}
+
+function updateFileLabel(input,labelId){ const el=document.getElementById(labelId); if(!el) return; if(input.files&&input.files.length){ el.textContent=input.files.length>1?`已選 ${input.files.length} 張`:input.files[0].name; }else{ el.textContent='選擇圖片'; } }
+
+// ── MOBILE TAB BAR ──
+let mobileTab = 'main'; // 'nav' | 'main' | 'wall'
+function isMobile(){ return window.innerWidth <= 640; }
+function isTablet(){ return window.innerWidth > 640 && window.innerWidth <= 900; }
+
+function initResponsive(){
+  const tabBar = document.getElementById('mobileTabBar');
+  if(isMobile()){
+    tabBar.style.display='flex';
+    applyMobileTab(mobileTab);
+  } else {
+    tabBar.style.display='none';
+    // Reset any mobile classes
+    document.getElementById('leftSidebar')?.classList.remove('mobile-active');
+    document.querySelector('.mid-col')?.classList.remove('mobile-active');
+    document.querySelector('.right-col')?.classList.remove('mobile-active');
+    // Tablet: right col toggle becomes floating button
+    if(isTablet()){
+      const rightCol = document.querySelector('.right-col');
+      rightCol?.classList.remove('mobile-open');
+    }
+  }
+}
+
+function setMobileTab(tab){
+  mobileTab = tab;
+  applyMobileTab(tab);
+}
+function applyMobileTab(tab){
+  const leftCol = document.getElementById('leftSidebar');
+  const midCol = document.querySelector('.mid-col');
+  const rightCol = document.querySelector('.right-col');
+  [leftCol, midCol, rightCol].forEach(el=>el?.classList.remove('mobile-active'));
+  if(tab==='nav') leftCol?.classList.add('mobile-active');
+  else if(tab==='main') midCol?.classList.add('mobile-active');
+  else if(tab==='wall') rightCol?.classList.add('mobile-active');
+  document.querySelectorAll('.mobile-tab-btn').forEach(b=>b.classList.remove('active'));
+  const btnMap = {nav:'mTabNav', main:'mTabMain', wall:'mTabWall'};
+  document.getElementById(btnMap[tab])?.classList.add('active');
+}
+// Tablet: right col toggle opens as side overlay
+function toggleRightCol(){
+  const col = document.getElementById('mainThreeCol');
+  const rightCol = document.querySelector('.right-col');
+  const btn = document.getElementById('rightToggleBtn');
+  if(isTablet()){
+    const isOpen = rightCol.classList.toggle('mobile-open');
+    btn.textContent = isOpen ? '›' : '‹';
+    btn.title = isOpen ? '收合回應欄' : '展開回應欄';
+  } else {
+    const isCollapsed = col.classList.toggle('right-collapsed');
+    btn.textContent = isCollapsed ? '‹' : '›';
+    btn.title = isCollapsed ? '展開回應欄' : '收合回應欄';
+  }
+}
+
+window.addEventListener('resize', initResponsive);
+
+function toggleLeftCol(){
+  const col=document.getElementById('mainThreeCol');
+  const btn=document.getElementById('leftToggleBtn');
+  const isCollapsed=col.classList.toggle('left-collapsed');
+  btn.textContent=isCollapsed?'›':'‹';
+  btn.title=isCollapsed?'展開側欄':'收合側欄';
+}
+
+function toast(msg){ const el=document.getElementById('toast'); el.className='toast'; el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2200); }
+function toastError(msg){ const el=document.getElementById('toast'); el.className='toast error'; el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),3000); }
+
+// loadAllData() and initResponsive() called after Firebase dynamic import completes
+
+</script>
+</body>
+</html>
