@@ -877,7 +877,15 @@ async function loadAllData(){
           data[c.month].cards.push(card);
         });
       }
-      if(activeMonth) renderCardList(activeMonth);
+      if(activeMonth) {
+        renderCardList(activeMonth);
+        // update count in header without full re-render
+        const countEl=document.querySelector('.month-band-stats');
+        const countEl2=document.querySelector('.materials-count');
+        const n=(data[activeMonth]&&data[activeMonth].cards.length)||0;
+        if(countEl) countEl.textContent=`${n} 份材料`;
+        if(countEl2) countEl2.textContent=`${n} 份`;
+      }
       renderSidebar();
     });
 
@@ -1085,9 +1093,10 @@ function renderCardList(mid){
   if(!cards.length){el.innerHTML='';return;}
   el.innerHTML=cards.map((c,ci)=>{
     const emo=CARD_EMOJIS[ci%CARD_EMOJIS.length];
+    const cid=c.fbKey||c.id;
     const thumbHtml=c.refImgs&&c.refImgs.length?`<img src="${c.refImgs[0]}" style="width:100%;height:100%;object-fit:cover;">`:`<span>${emo}</span>`;
-    return `<div class="card-row${c.expanded?' expanded':''}" id="cardRow-${c.id}">
-      <div class="card-row-main" onclick="toggleCardExpand('${mid}',${c.id})">
+    return `<div class="card-row${c.expanded?' expanded':''}" id="cardRow-${cid}">
+      <div class="card-row-main" onclick="toggleCardExpand('${mid}','${cid}')">
         <div class="card-row-thumb">${thumbHtml}</div>
         <div class="card-row-info">
           <div class="card-row-title">${c.title}</div>
@@ -1100,17 +1109,17 @@ function renderCardList(mid){
       </div>
       <div class="card-detail">
         <div class="card-detail-tabs-bar">
-          <button class="detail-tab tab-summary${c.openSummary?' open':''}" onclick="toggleDetailTab('${mid}',${c.id},'Summary')">
+          <button class="detail-tab tab-summary${c.openSummary?' open':''}" onclick="toggleDetailTab('${mid}','${cid}','Summary')">
             <span class="detail-tab-label">SUMMARY</span><span class="detail-tab-chevron${c.openSummary?' open':''}">▾</span>
           </button>
-          <button class="detail-tab tab-imagination${c.openImagination?' open':''}" onclick="toggleDetailTab('${mid}',${c.id},'Imagination')">
+          <button class="detail-tab tab-imagination${c.openImagination?' open':''}" onclick="toggleDetailTab('${mid}','${cid}','Imagination')">
             <span class="detail-tab-label">SPECULATION</span><span class="detail-tab-chevron${c.openImagination?' open':''}">▾</span>
           </button>
-          <button class="detail-tab tab-reference${c.openReference?' open':''}" onclick="toggleDetailTab('${mid}',${c.id},'Reference')">
+          <button class="detail-tab tab-reference${c.openReference?' open':''}" onclick="toggleDetailTab('${mid}','${cid}','Reference')">
             <span class="detail-tab-label">OPEN NOTE</span><span class="detail-tab-chevron${c.openReference?' open':''}">▾</span>
           </button>
           <div style="flex:1;"></div>
-          <button class="btn btn-ghost btn-sm" style="margin:6px 8px;" onclick="deleteCard('${mid}',${c.id})">刪除</button>
+          <button class="btn btn-ghost btn-sm" style="margin:6px 8px;" onclick="deleteCard('${mid}','${cid}')">刪除</button>
         </div>
         <div class="detail-section ds-summary${c.openSummary?' open':''}">
           <div class="d-grid">
@@ -1136,12 +1145,12 @@ function renderCardList(mid){
   }).join('');
 }
 function toggleCardExpand(mid,id){
-  const c=data[mid].cards.find(c=>c.id===id); if(!c) return;
+  const c=data[mid]?.cards.find(c=>c.fbKey===id||c.id===id); if(!c) return;
   c.expanded=!c.expanded;
   renderCardList(mid);
 }
 function toggleDetailTab(mid,id,sec){
-  const c=data[mid].cards.find(c=>c.id===id); if(!c) return;
+  const c=data[mid]?.cards.find(c=>c.fbKey===id||c.id===id); if(!c) return;
   const key='open'+sec; c[key]=!c[key];
   renderCardList(mid);
 }
@@ -1467,7 +1476,39 @@ function renderOverallTopics(){
 
 // ── MONTH ADD/DELETE ──
 function nextMonthLabel(){ if(!monthDefs.length) return 'January'; const last=monthDefs[monthDefs.length-1].label; const idx=MONTH_SEQUENCE.indexOf(last); if(idx===-1) return 'New Month'; return MONTH_SEQUENCE[(idx+1)%12]; }
-function openEmojiPicker(){ const label=nextMonthLabel(); const overlay=document.createElement('div'); overlay.className='modal-overlay'; overlay.id='emojiPickerOverlay'; overlay.innerHTML=`<div class="modal-box"><div class="modal-title">新增「${label}」</div><div class="modal-sub">幫這個月選一個代表 Emoji</div><div class="emoji-grid">${EMOJI_PICKER_OPTIONS.map(e=>`<button class="emoji-option" onclick="confirmAddMonth('${label}','${e}')">${e}</button>`).join('')}</div><button class="btn btn-ghost btn-sm" style="margin-top:14px;" onclick="closeModal('emojiPickerOverlay')">取消</button></div>`; document.body.appendChild(overlay); }
+function openEmojiPicker(){
+  const existingLabels = monthDefs.map(m=>m.label);
+  const available = MONTH_SEQUENCE.filter(m=>!existingLabels.includes(m));
+  const monthOpts = available.length
+    ? available
+    : MONTH_SEQUENCE; // if all exist, still show all (allow duplicates)
+  const overlay=document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.id='emojiPickerOverlay';
+  overlay.innerHTML=`
+    <div class="modal-box" style="max-width:420px;">
+      <div class="modal-title">新增月份</div>
+      <div class="modal-sub" style="margin-bottom:14px;">先選月份，再選代表 Emoji</div>
+      <div id="monthPickStep1">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+          ${monthOpts.map(m=>`<button class="emoji-option" style="font-size:13px;font-weight:700;aspect-ratio:auto;padding:10px 6px;" onclick="pickMonthLabel('${m}')">${m}</button>`).join('')}
+        </div>
+        <button class="btn btn-ghost btn-sm" style="width:100%;" onclick="closeModal('emojiPickerOverlay')">取消</button>
+      </div>
+      <div id="monthPickStep2" style="display:none;">
+        <div id="monthPickLabel" style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:10px;"></div>
+        <div class="emoji-grid">${EMOJI_PICKER_OPTIONS.map(e=>`<button class="emoji-option" onclick="confirmAddMonth(window._pendingMonthLabel,'${e}')">${e}</button>`).join('')}</div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:12px;" onclick="document.getElementById('monthPickStep1').style.display='';document.getElementById('monthPickStep2').style.display='none';">← 重選月份</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+function pickMonthLabel(label){
+  window._pendingMonthLabel = label;
+  document.getElementById('monthPickStep1').style.display='none';
+  document.getElementById('monthPickStep2').style.display='';
+  document.getElementById('monthPickLabel').textContent=`為「${label}」選一個 Emoji`;
+}
 function closeModal(id){ const el=document.getElementById(id); if(el) el.remove(); }
 async function confirmAddMonth(label,emoji){
   closeModal('emojiPickerOverlay');
