@@ -379,27 +379,84 @@ textarea:focus, input[type="text"]:focus { border-color: var(--orange); backgrou
 .wall-form-row { display: flex; gap: 7px; align-items: flex-end; }
 
 /* Book cards (Home) */
-.book-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-.book-row { background: var(--card-bg); border-radius: 16px; overflow: hidden; cursor: default; transition: all 0.15s; border: 1.5px solid transparent; display: flex; flex-direction: column; }
-.book-row:hover { border-color: var(--orange); background: white; }
-.book-row.expanded { border-color: var(--ink); background: white; }
-.book-row-main { display: flex; align-items: stretch; cursor: pointer; }
-.book-row-thumb { width: 72px; flex-shrink: 0; background: var(--border-soft); display: flex; align-items: center; justify-content: center; font-size: 22px; border-right: 1.5px solid var(--border-soft); min-height: 64px; }
-.book-row-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.book-row-info { flex: 1; padding: 12px 14px; min-width: 0; }
-.book-row-title { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.book-row-desc { font-size: 12px; color: var(--ink-light); margin-bottom: 4px; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.book-row-meta { font-size: 11px; color: var(--ink-light); }
-.book-row-actions { display: flex; align-items: center; gap: 8px; padding: 12px 14px 12px 0; flex-shrink: 0; }
-.book-row-resp-badge { font-size: 10.5px; font-weight: 600; color: var(--orange); background: #fff5f0; padding: 2px 9px; border-radius: 20px; }
-.book-expand-chevron { font-size: 11px; color: var(--ink-faint); transition: transform 0.2s; }
-.book-row.expanded .book-expand-chevron { transform: rotate(180deg); }
-.book-detail { display: none; padding: 14px 18px; border-top: 1.5px solid var(--border-soft); background: var(--card-bg); }
-.book-row.expanded .book-detail { display: block; }
-.book-type-badge { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.04em; padding: 2px 7px; border-radius: 20px; margin-bottom: 5px; }
-.badge-other { background: #FFF1D6; color: #C2790E; }
-.book-name { font-size: 12.5px; font-weight: 700; color: var(--ink); line-height: 1.4; margin-bottom: 3px; }
-.book-who { font-size: 11px; color: var(--ink-light); margin-bottom: 5px; }
+/* ── BOOK GRID VIEW (Apple Watch style circles) ── */
+#bookGridView { padding: 4px 0 20px; }
+.book-kw-group { margin-bottom: 32px; }
+.book-kw-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-light); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.book-kw-label::after { content: ''; flex: 1; height: 1px; background: var(--border-soft); }
+/* Apple Watch style cluster: circles bunch together on hover */
+.book-circle-cluster {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  position: relative;
+}
+.book-circle {
+  width: 72px; display: flex; flex-direction: column; align-items: center; gap: 5px;
+  cursor: pointer; position: relative;
+  animation: floatIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes floatIn {
+  from { opacity:0; transform: scale(0.5) translateY(10px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
+.book-circle:nth-child(1){ animation-delay:0s; }
+.book-circle:nth-child(2){ animation-delay:0.05s; }
+.book-circle:nth-child(3){ animation-delay:0.1s; }
+.book-circle:nth-child(4){ animation-delay:0.15s; }
+.book-circle:nth-child(5){ animation-delay:0.2s; }
+.book-circle:nth-child(6){ animation-delay:0.25s; }
+.book-circle:nth-child(7){ animation-delay:0.3s; }
+.book-circle:nth-child(8){ animation-delay:0.35s; }
+/* cluster hover: nearby siblings gently push apart */
+.book-circle-cluster:hover .book-circle { transition: transform 0.2s ease; }
+.book-circle:hover { z-index: 10; }
+.book-circle:hover ~ .book-circle { transform: translateX(6px); }
+.book-circle-img {
+  width: 72px; height: 72px; border-radius: 50%; overflow: hidden;
+  background: var(--card-bg); display: flex; align-items: center; justify-content: center;
+  font-size: 26px; flex-shrink: 0;
+  border: 2.5px solid transparent;
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s, border-color 0.15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  position: relative;
+}
+.book-circle:hover .book-circle-img {
+  border-color: var(--orange);
+  transform: scale(1.15);
+  box-shadow: 0 6px 20px rgba(255,106,43,0.3);
+}
+.book-circle-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.book-circle-title {
+  font-size: 10px; font-weight: 600; color: var(--ink-light); text-align: center;
+  line-height: 1.35; max-width: 76px;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  transition: color 0.15s;
+}
+.book-circle:hover .book-circle-title { color: var(--orange); }
+/* Book modal */
+.book-modal-overlay {
+  position: fixed; inset: 0; background: rgba(28,28,30,0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2000; backdrop-filter: blur(4px); padding: 20px;
+}
+.book-modal {
+  background: white; border-radius: 24px; width: 100%; max-width: 520px;
+  max-height: 85vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+.book-modal-thumb { width: 100%; height: 200px; object-fit: cover; border-radius: 20px 20px 0 0; display: block; }
+.book-modal-thumb-placeholder { width: 100%; height: 120px; display: flex; align-items: center; justify-content: center; font-size: 48px; background: var(--card-bg); border-radius: 20px 20px 0 0; }
+.book-modal-body { padding: 20px 24px 24px; }
+.book-modal-title { font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 6px; line-height: 1.3; }
+.book-modal-meta { font-size: 12px; color: var(--ink-light); margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+.book-modal-desc { font-size: 13.5px; color: var(--ink); line-height: 1.7; margin-bottom: 14px; }
+.book-modal-kws { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.book-modal-kw { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: var(--card-bg); color: var(--ink-light); }
+.book-modal-resp-list { margin-top: 16px; border-top: 1px solid var(--border-soft); padding-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.book-modal-resp-item { background: var(--card-bg); border-radius: 12px; padding: 10px 12px; font-size: 13px; color: var(--ink); line-height: 1.6; position: relative; }
+.book-modal-resp-who { font-size: 10px; color: var(--ink-faint); font-weight: 600; margin-top: 4px; }
 .book-link { font-size: 11px; color: var(--orange); display: inline-flex; align-items: center; gap: 2px; text-decoration: none; font-weight: 600; }
 .book-link:hover { text-decoration: underline; }
 .del-btn { position: absolute; top: 7px; right: 7px; background: var(--card-bg); border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; color: var(--ink-light); display: flex; align-items: center; justify-content: center; }
@@ -578,12 +635,13 @@ textarea:focus, input[type="text"]:focus { border-color: var(--orange); backgrou
         <div class="home-page">
           <div id="homeSetupBanner"></div>
           <div class="home-section-title">Material 材料許願池</div>
-          <div class="book-list" id="bookListOverall"><div class="empty-state">許願池還空著</div></div>
+          <div id="bookGridView"><div class="empty-state">許願池還空著</div></div>
           <div class="add-row" style="margin-bottom:24px;">
             <div class="field-group" style="flex:2;min-width:110px;"><div class="field-label">Title 標題</div><input type="text" id="bookTitleOverall" placeholder=""></div>
             <div class="field-group" style="flex:2;min-width:110px;"><div class="field-label">Description 簡短說明</div><input type="text" id="bookTypeOverall" placeholder=""></div>
             <div class="field-group" style="flex:1;min-width:65px;"><div class="field-label">By 推薦人</div><input type="text" id="bookWhoOverall" placeholder=""></div>
             <div class="field-group" style="flex:2;min-width:130px;"><div class="field-label">Link 連結</div><input type="text" id="bookLinkOverall" placeholder="https://..."></div>
+            <div class="field-group" style="flex:2;min-width:130px;"><div class="field-label">Keywords 關鍵字（逗號分隔）</div><input type="text" id="bookKeywordsOverall" placeholder=""></div>
             <div class="field-group" style="min-width:130px;"><div class="field-label">Image 上傳圖片</div><label class="file-upload-btn" for="bookImgOverall"><span id="bookImgOverallLabel">選擇圖片</span></label><input type="file" id="bookImgOverall" accept="image/*" style="display:none;" onchange="updateFileLabel(this,'bookImgOverallLabel')"></div>
             <button class="btn btn-sm" onclick="addBookOverall()">+ 加入</button>
           </div>
@@ -886,7 +944,8 @@ async function loadAllData(){
     fbListen('books', val => {
       overallBooks = val ? Object.entries(val).map(([fbKey,b])=>({
         fbKey, id:fbKey, title:b.title||'', type:b.type||'', who:b.who||'',
-        link:b.link||'', img:b.img||''
+        link:b.link||'', img:b.img||'',
+        keywords: Array.isArray(b.keywords) ? b.keywords : (b.keywords||'').split(',').filter(Boolean)
       })) : [];
       renderBooksOverall();
     });
@@ -1026,6 +1085,7 @@ function enterSubmit(mid){
   document.getElementById('submitKwRow').innerHTML=m.reading.map(r=>`<span class="submit-kw">${r}</span>`).join('');
   clearSubmitForm();
   updatePreview();
+  setTimeout(()=>injectKwDatalist('ncKeywords'),100);
 }
 function exitSubmit(){
   submitForMonth=null;
@@ -1361,9 +1421,12 @@ function renderWallCol(){
       overallBooks.map(b=>{
         const bid=b.fbKey||b.id;
         const wallCount=(bookWalls[bid]||[]).length;
+        const KW_COLORS=['#D9F7E6','#FDE0F0','#FFE3D1','#DCEEFD','#EDE3FF','#FFF1C2','#FFE0DC'];
+        const kwHtml=(b.keywords||[]).map((kw,i)=>`<span style="display:inline-block;font-size:9.5px;font-weight:700;padding:1px 8px;border-radius:20px;background:${KW_COLORS[i%KW_COLORS.length]};color:#444;margin-right:4px;">${kw}</span>`).join('');
         return `<div style="background:var(--card-bg);border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all 0.13s;border:1.5px solid transparent;" onmouseenter="this.style.borderColor='var(--orange)'" onmouseleave="this.style.borderColor='transparent'" onclick="selectBookForResponse('${bid}')">
-          <div style="font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:2px;">${b.title}</div>
-          <div style="font-size:10.5px;color:var(--ink-light);">✦ ${b.who}${b.type?' · '+b.type:''}</div>
+          <div style="font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:3px;">${b.title}</div>
+          ${kwHtml?`<div style="margin-bottom:4px;">${kwHtml}</div>`:''}
+          <div style="font-size:10.5px;color:var(--ink-light);">✦ ${b.who}</div>
           ${wallCount?`<div style="font-size:10px;color:var(--orange);margin-top:4px;">💬 ${wallCount} 則回應</div>`:''}
         </div>`;
       }).join('');
@@ -1393,7 +1456,8 @@ function renderWallCol(){
 
 let selectedBookId = null;
 function selectBookForResponse(bookId){
-  toggleBookExpand(bookId);
+  selectedBookId=bookId;
+  renderBookResponses(bookId);
 }
 function renderBookResponses(bookId){
   const label=document.getElementById('wallColLabel');
@@ -1528,15 +1592,16 @@ async function removeWallItem(id){
 // ── BOOKS ──
 async function addBookOverall(){
   const t=document.getElementById('bookTitleOverall').value.trim(); if(!t) return toast('請填入標題！');
-  const type=document.getElementById('bookTypeOverall').value.trim()||'其他';
+  const type=document.getElementById('bookTypeOverall').value.trim()||'';
   const who=document.getElementById('bookWhoOverall').value.trim()||'匿名';
   const link=document.getElementById('bookLinkOverall').value.trim();
+  const keywords=(document.getElementById('bookKeywordsOverall')?.value||'').split(',').map(k=>k.trim()).filter(Boolean);
   const file=document.getElementById('bookImgOverall').files[0];
   const finish=async(img)=>{
-    ['bookTitleOverall','bookTypeOverall','bookWhoOverall','bookLinkOverall'].forEach(x=>document.getElementById(x).value='');
+    ['bookTitleOverall','bookTypeOverall','bookWhoOverall','bookLinkOverall','bookKeywordsOverall'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';});
     document.getElementById('bookImgOverall').value=''; document.getElementById('bookImgOverallLabel').textContent='選擇圖片';
     toast('許願池加入！');
-    try{ await fbPush('books',{title:t,type,who,link,img:img||''}); }catch(e){ toastError('⚠️ 儲存失敗'); }
+    try{ await fbPush('books',{title:t,type,who,link,img:img||'',keywords}); }catch(e){ toastError('⚠️ 儲存失敗'); }
   };
   if(file){const reader=new FileReader();reader.onload=e=>finish(e.target.result);reader.readAsDataURL(file);} else finish('');
 }
@@ -1548,75 +1613,245 @@ async function removeBookOverall(id){
   try{ await fbRemove(`books/${fbKey}`); }catch(e){ toastError('⚠️ 刪除失敗'); }
 }
 function renderBooksOverall(){
-  const el=document.getElementById('bookListOverall'); if(!el) return;
+  const el=document.getElementById('bookGridView'); if(!el) return;
   if(!overallBooks.length){el.innerHTML='<div class="empty-state">許願池還空著</div>';return;}
-  el.innerHTML=overallBooks.map((b,bi)=>{
-    const bid = b.fbKey||b.id;
-    const descFull = b.type||'';
-    const descShort = descFull.length > 30 ? descFull.slice(0,30)+'…' : descFull;
-    const respCount = (bookWalls[bid]||[]).filter(r=>r.type==='response'||!r.type).length;
-    const refCount = (bookWalls[bid]||[]).filter(r=>r.type==='ref').length;
-    const countBadge = [respCount?`💬 ${respCount}`:'', refCount?`🖼 ${refCount}`:''].filter(Boolean).join(' · ');
-    const isExpanded = selectedBookId===bid;
-    const thumbHtml = b.img
-      ? `<img src="${b.img}" style="width:100%;height:100%;object-fit:cover;">`
-      : b.link ? linkThumbHtml(b.link,'','width:100%;height:100%;') : `<span>📚</span>`;
-    return `<div class="book-row${isExpanded?' expanded':''}" id="bookRow-${bid}">
-      <div class="book-row-main" onclick="toggleBookExpand('${bid}')">
-        <div class="book-row-thumb">${thumbHtml}</div>
-        <div class="book-row-info">
-          <div class="book-row-title">${b.title}</div>
-          ${descFull?`<div class="book-row-desc">${isExpanded?descFull:descShort}</div>`:''}
-          <div class="book-row-meta">✦ ${b.who}${b.link?` · <a href="${b.link}" target="_blank" style="color:var(--orange);font-weight:600;text-decoration:none;" onclick="event.stopPropagation()">🔗 開啟</a>`:''}</div>
-        </div>
-        <div class="book-row-actions">
-          ${countBadge?`<span class="book-row-resp-badge">${countBadge}</span>`:''}
-          <span class="book-expand-chevron${isExpanded?' open':''}">▼</span>
-          <button class="del-btn" style="position:static;margin-left:2px;" onclick="event.stopPropagation();removeBookOverall('${bid}')">×</button>
+  if(window.d3){ _drawForceGraph(); }
+  else {
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js';
+    s.onload=()=>_drawForceGraph();
+    s.onerror=()=>{ el.innerHTML='<div class="empty-state">圖表載入失敗，請重新整理頁面</div>'; };
+    document.head.appendChild(s);
+  }
+  // inject keyword suggestions into the add-form input
+  setTimeout(()=>injectKwDatalist('bookKeywordsOverall'),100);
+}
+
+function _drawForceGraph(){
+  const el=document.getElementById('bookGridView'); if(!el||!window.d3) return;
+  const d3=window.d3;
+  const W=el.offsetWidth||600;
+  const H=Math.max(460,Math.min(700,overallBooks.length*80));
+  el.innerHTML=`<svg id="bookForceGraph" width="${W}" height="${H}" style="display:block;overflow:visible;"></svg>`;
+
+  const KW_COLORS=['#D9F7E6','#FDE0F0','#FFE3D1','#DCEEFD','#EDE3FF','#FFF1C2','#FFE0DC'];
+  const kwSet={};
+  overallBooks.forEach(b=>(b.keywords||[]).forEach(kw=>{ if(!(kw in kwSet)) kwSet[kw]=Object.keys(kwSet).length; }));
+
+  const kwNodes=Object.keys(kwSet).map(kw=>({id:'kw:'+kw,label:kw,type:'kw',color:KW_COLORS[kwSet[kw]%KW_COLORS.length]}));
+  const bookNodes=overallBooks.map(b=>({id:b.fbKey||b.id,label:b.title,type:'book',book:b}));
+  const nodes=[...kwNodes,...bookNodes];
+  const links=[];
+  overallBooks.forEach(b=>{ (b.keywords||[]).forEach(kw=>{ links.push({source:'kw:'+kw,target:b.fbKey||b.id}); }); });
+
+  const svg=d3.select('#bookForceGraph');
+  const defs=svg.append('defs');
+  bookNodes.forEach(n=>{
+    defs.append('clipPath').attr('id','clip-'+n.id.replace(/[^a-zA-Z0-9]/g,'-'))
+      .append('circle').attr('r',28);
+  });
+
+  // Stronger separation: book r=42, kw r=50 (accounts for pill half-width)
+  const sim=d3.forceSimulation(nodes)
+    .force('link',d3.forceLink(links).id(d=>d.id).distance(120).strength(0.4))
+    .force('charge',d3.forceManyBody().strength(-280))
+    .force('center',d3.forceCenter(W/2,H/2))
+    .force('collision',d3.forceCollide().radius(d=>d.type==='kw'?52:44).strength(1).iterations(4))
+    .force('x',d3.forceX(W/2).strength(0.04))
+    .force('y',d3.forceY(H/2).strength(0.04))
+    .alphaDecay(0.02); // slower decay = more time to resolve overlaps
+
+  const link=svg.append('g').selectAll('line').data(links).join('line')
+    .attr('stroke','#ddd').attr('stroke-width',1.5).attr('stroke-dasharray','4,3');
+
+  const node=svg.append('g').selectAll('g').data(nodes).join('g')
+    .attr('cursor','pointer')
+    .call(d3.drag()
+      .on('start',(e,d)=>{ if(!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x;d.fy=d.y; })
+      .on('drag',(e,d)=>{ d.fx=e.x;d.fy=e.y; })
+      .on('end',(e,d)=>{ if(!e.active) sim.alphaTarget(0); d.fx=null;d.fy=null; }));
+
+  // ── KEYWORD PILL NODES ──
+  node.filter(d=>d.type==='kw').each(function(d){
+    const g=d3.select(this);
+    const pw=Math.max(60, d.label.length*9+28);
+    g.append('rect').attr('rx',14).attr('height',28).attr('width',pw)
+      .attr('x',-pw/2).attr('y',-14).attr('fill',d.color).attr('opacity',0.92)
+      .attr('stroke','rgba(0,0,0,0.08)').attr('stroke-width',1);
+    const txt=g.append('text').attr('text-anchor','middle').attr('dy','0.35em')
+      .attr('font-size','11px').attr('font-weight','700').attr('fill','#444')
+      .text(d.label).attr('pointer-events','none');
+
+    // Click keyword to edit label inline
+    g.on('click',(e)=>{
+      e.stopPropagation();
+      const oldKw=d.label;
+      // Show a small input overlay near the node
+      const svgRect=document.getElementById('bookForceGraph').getBoundingClientRect();
+      const elRect=el.getBoundingClientRect();
+      const input=document.createElement('input');
+      input.value=oldKw;
+      input.style.cssText=`position:fixed;left:${svgRect.left+(d.x||W/2)-50}px;top:${svgRect.top+(d.y||H/2)-16}px;width:110px;font-size:12px;font-weight:700;padding:4px 10px;border:2px solid var(--orange);border-radius:20px;outline:none;z-index:3000;text-align:center;background:white;`;
+      document.body.appendChild(input);
+      input.focus(); input.select();
+      const finish=async()=>{
+        const newKw=input.value.trim();
+        input.remove();
+        if(!newKw||newKw===oldKw) return;
+        // Rename keyword in all books
+        const affected=overallBooks.filter(b=>(b.keywords||[]).includes(oldKw));
+        await Promise.all(affected.map(async b=>{
+          b.keywords=b.keywords.map(k=>k===oldKw?newKw:k);
+          const bid=b.fbKey||b.id;
+          try{ await fbSet(`books/${bid}`,{title:b.title,type:b.type,who:b.who,link:b.link,img:b.img||'',keywords:b.keywords}); }
+          catch(e){ toastError('⚠️ 儲存失敗'); }
+        }));
+        toast(`✓ 關鍵字「${oldKw}」→「${newKw}」`);
+        renderBooksOverall();
+      };
+      input.addEventListener('keydown',e=>{ if(e.key==='Enter') finish(); if(e.key==='Escape'){ input.remove(); } });
+      input.addEventListener('blur',finish);
+    });
+  });
+
+  // ── BOOK CIRCLE NODES ──
+  node.filter(d=>d.type==='book').each(function(d){
+    const g=d3.select(this);
+    const b=d.book; const bid=b.fbKey||b.id;
+    const clipId='clip-'+bid.replace(/[^a-zA-Z0-9]/g,'-');
+    g.append('circle').attr('r',30).attr('fill','#f5f5f6').attr('stroke','#e0e0e0').attr('stroke-width',2);
+    const ytMatch=(b.link||'').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    const imgSrc=b.img?b.img:ytMatch?`https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`
+      :b.link?`https://api.microlink.io/?url=${encodeURIComponent(b.link)}&screenshot=false&meta=true&embed=image.url`:null;
+    if(imgSrc){
+      g.append('image').attr('href',imgSrc).attr('x',-28).attr('y',-28).attr('width',56).attr('height',56)
+        .attr('clip-path',`url(#${clipId})`).attr('preserveAspectRatio','xMidYMid slice');
+    } else {
+      g.append('text').attr('text-anchor','middle').attr('dy','0.35em').attr('font-size','20px').text('📚');
+    }
+    g.append('text').attr('text-anchor','middle').attr('y',42)
+      .attr('font-size','10px').attr('font-weight','600').attr('fill','#555').attr('pointer-events','none')
+      .text(b.title.length>14?b.title.slice(0,13)+'…':b.title);
+    const rc=(bookWalls[bid]||[]).length;
+    if(rc){
+      g.append('circle').attr('cx',22).attr('cy',-22).attr('r',9).attr('fill','var(--orange)').attr('stroke','white').attr('stroke-width',2);
+      g.append('text').attr('x',22).attr('y',-22).attr('text-anchor','middle').attr('dy','0.35em')
+        .attr('font-size','8px').attr('font-weight','700').attr('fill','white').text(rc);
+    }
+    g.on('mouseover',()=>g.select('circle').attr('stroke','var(--orange)').attr('stroke-width',2.5))
+     .on('mouseout',()=>g.select('circle').attr('stroke','#e0e0e0').attr('stroke-width',2))
+     .on('click',()=>openBookModal(bid));
+  });
+
+  sim.on('tick',()=>{
+    link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y)
+        .attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+    node.attr('transform',d=>`translate(${Math.max(52,Math.min(W-52,d.x||W/2))},${Math.max(52,Math.min(H-56,d.y||H/2))})`);
+  });
+}
+
+function openBookModal(bid){
+  const b=overallBooks.find(b=>(b.fbKey||b.id)===bid); if(!b) return;
+  selectedBookId=bid;
+  renderBookResponses(bid); // update right col
+  const responses=bookWalls[bid]||[];
+  const RTAG_COLORS=['#D9F7E6','#FDE0F0','#FFE3D1','#DCEEFD','#EDE3FF','#FFF1C2','#FFE0DC'];
+  const kwHtml=(b.keywords||[]).map((kw,i)=>`<span class="book-modal-kw" style="background:${RTAG_COLORS[i%RTAG_COLORS.length]};">${kw}</span>`).join('');
+  const respHtml=responses.length
+    ? `<div class="book-modal-resp-list">${responses.map(r=>{
+        const rid=r.fbKey||r.id;
+        return `<div class="book-modal-resp-item">
+          ${r.type==='ref'&&r.imgSrc?`<img src="${r.imgSrc}" style="width:100%;height:80px;object-fit:cover;border-radius:8px;margin-bottom:6px;">`:''}
+          <div>${r.text||r.title||''}</div>
+          <div class="book-modal-resp-who">✦ ${r.who}</div>
+          <button onclick="removeBookWallItem('${bid}','${rid}')" style="position:absolute;top:6px;right:6px;background:none;border:none;cursor:pointer;font-size:11px;color:var(--ink-faint);">×</button>
+        </div>`;
+      }).join('')}</div>`
+    : '';
+  const ytMatch=(b.link||'').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  const modalThumbSrc = b.img ? b.img
+    : ytMatch ? `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`
+    : b.link ? `https://api.microlink.io/?url=${encodeURIComponent(b.link)}&screenshot=false&meta=true&embed=image.url`
+    : null;
+  const thumbHtml = modalThumbSrc
+    ? `<img class="book-modal-thumb" src="${modalThumbSrc}" alt="${b.title}" onerror="this.outerHTML='<div class=\\'book-modal-thumb-placeholder\\'>📚</div>'">`
+    : `<div class="book-modal-thumb-placeholder">📚</div>`;
+  const overlay=document.createElement('div');
+  overlay.className='book-modal-overlay';
+  overlay.id='bookModalOverlay';
+  overlay.onclick=e=>{if(e.target===overlay) closeBookModal();};
+  overlay.innerHTML=`<div class="book-modal">
+    ${thumbHtml}
+    <div class="book-modal-body">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
+        <div class="book-modal-title">${b.title}</div>
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button class="btn btn-ghost btn-sm" onclick="closeBookModal();startBookEdit('${bid}')">✎ 編輯</button>
+          <button class="btn btn-ghost btn-sm" style="color:#FF6B5B;" onclick="closeBookModal();removeBookOverall('${bid}')">刪除</button>
+          <button onclick="closeBookModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-light);line-height:1;">×</button>
         </div>
       </div>
-      <div class="book-detail">
-        ${b.editing ? `
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            <div><div class="d-label">Title 標題</div><input type="text" id="be_title_${bid}" value="${b.title.replace(/"/g,'&quot;')}" style="font-size:13px;font-weight:700;"></div>
-            <div><div class="d-label">Description 簡短說明</div><input type="text" id="be_type_${bid}" value="${(b.type||'').replace(/"/g,'&quot;')}"></div>
-            <div><div class="d-label">By 推薦人</div><input type="text" id="be_who_${bid}" value="${(b.who||'').replace(/"/g,'&quot;')}"></div>
-            <div><div class="d-label">Link 連結</div><input type="text" id="be_link_${bid}" value="${(b.link||'').replace(/"/g,'&quot;')}"></div>
-            <div style="display:flex;gap:6px;margin-top:4px;">
-              <button class="btn btn-green btn-sm" onclick="saveBookEdit('${bid}')">✓ 儲存</button>
-              <button class="btn btn-ghost btn-sm" onclick="cancelBookEdit('${bid}')">取消</button>
-            </div>
-          </div>
-        ` : `
-          ${descFull?`<div style="font-size:13px;color:var(--ink);line-height:1.7;margin-bottom:8px;">${descFull}</div>`:''}
-          ${b.link?`<a href="${b.link}" target="_blank" style="font-size:12px;color:var(--orange);font-weight:600;text-decoration:none;">🔗 ${b.link.length>50?b.link.slice(0,50)+'…':b.link}</a>`:''}
-          <div style="margin-top:10px;display:flex;gap:6px;">
-            <button class="btn btn-ghost btn-sm" onclick="startBookEdit('${bid}')">✎ 編輯</button>
-          </div>
-        `}
+      <div class="book-modal-meta">
+        <span>✦ ${b.who}</span>
+        ${b.link?`<a href="${b.link}" target="_blank" style="color:var(--orange);font-weight:600;text-decoration:none;">🔗 開啟連結</a>`:''}
       </div>
-    </div>`;
-  }).join('');
+      ${kwHtml?`<div class="book-modal-kws">${kwHtml}</div>`:''}
+      ${b.type?`<div class="book-modal-desc">${b.type}</div>`:''}
+      ${respHtml}
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+function closeBookModal(){
+  const el=document.getElementById('bookModalOverlay'); if(el) el.remove();
 }
 function startBookEdit(bid){
   const b=overallBooks.find(b=>(b.fbKey||b.id)===bid); if(!b) return;
-  b.editing=true; renderBooksOverall();
+  // close any existing book modal first
+  closeBookModal();
+  const overlay=document.createElement('div');
+  overlay.className='book-modal-overlay';
+  overlay.id='bookEditOverlay';
+  overlay.onclick=e=>{if(e.target===overlay) closeBookEdit();};
+  overlay.innerHTML=`<div class="book-modal">
+    <div class="book-modal-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <div style="font-size:17px;font-weight:800;color:var(--ink);">✎ 編輯材料</div>
+        <button onclick="closeBookEdit()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-light);">×</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div><div class="d-label">Title 標題</div><input type="text" id="be_title_${bid}" value="${b.title.replace(/"/g,'&quot;')}" style="font-size:15px;font-weight:700;"></div>
+        <div><div class="d-label">Description 簡短說明</div><input type="text" id="be_type_${bid}" value="${(b.type||'').replace(/"/g,'&quot;')}"></div>
+        <div><div class="d-label">By 推薦人</div><input type="text" id="be_who_${bid}" value="${(b.who||'').replace(/"/g,'&quot;')}"></div>
+        <div><div class="d-label">Link 連結</div><input type="text" id="be_link_${bid}" value="${(b.link||'').replace(/"/g,'&quot;')}"></div>
+        <div><div class="d-label">Keywords 關鍵字（逗號分隔）</div><input type="text" id="be_kw_${bid}" value="${(b.keywords||[]).join(', ').replace(/"/g,'&quot;')}" placeholder="surveillance, 身體, 儀式..."></div>
+        <div style="display:flex;gap:8px;margin-top:6px;">
+          <button class="btn btn-green btn-sm" onclick="saveBookEdit('${bid}')">✓ 儲存</button>
+          <button class="btn btn-ghost btn-sm" onclick="closeBookEdit()">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+  injectKwDatalist(`be_kw_${bid}`);
 }
-function cancelBookEdit(bid){
-  const b=overallBooks.find(b=>(b.fbKey||b.id)===bid); if(!b) return;
-  b.editing=false; renderBooksOverall();
+function closeBookEdit(){
+  const el=document.getElementById('bookEditOverlay'); if(el) el.remove();
 }
+function cancelBookEdit(bid){ closeBookEdit(); }
 async function saveBookEdit(bid){
   const b=overallBooks.find(b=>(b.fbKey||b.id)===bid); if(!b) return;
   b.title=document.getElementById(`be_title_${bid}`)?.value.trim()||b.title;
   b.type=document.getElementById(`be_type_${bid}`)?.value.trim()||'';
   b.who=document.getElementById(`be_who_${bid}`)?.value.trim()||b.who;
   b.link=document.getElementById(`be_link_${bid}`)?.value.trim()||'';
+  b.keywords=(document.getElementById(`be_kw_${bid}`)?.value||'').split(',').map(k=>k.trim()).filter(Boolean);
   b.editing=false;
+  closeBookEdit();
   renderBooksOverall();
   toast('✓ 材料已更新');
   try{
-    await fbSet(`books/${bid}`,{title:b.title,type:b.type,who:b.who,link:b.link,img:b.img||''});
+    await fbSet(`books/${bid}`,{title:b.title,type:b.type,who:b.who,link:b.link,img:b.img||'',keywords:b.keywords||[]});
   }catch(e){ toastError('⚠️ 儲存失敗'); }
 }
 function toggleBookExpand(bookId){
@@ -1708,6 +1943,67 @@ async function confirmDeleteMonth(mid){
   catch(e){ toastError('⚠️ 刪除同步失敗'); }
 }
 
+function getAllKeywords(){
+  const kwSet=new Set();
+  overallBooks.forEach(b=>(b.keywords||[]).forEach(kw=>{if(kw)kwSet.add(kw);}));
+  monthDefs.forEach(m=>(m.reading||[]).forEach(kw=>{if(kw)kwSet.add(kw);}));
+  return [...kwSet].sort();
+}
+
+// Custom comma-aware keyword autocomplete
+function injectKwDatalist(inputId){
+  const input=document.getElementById(inputId); if(!input||input._kwAutoInit) return;
+  input._kwAutoInit=true;
+
+  // create dropdown
+  const drop=document.createElement('div');
+  drop.style.cssText='position:absolute;background:white;border:1.5px solid var(--orange);border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:5000;max-height:180px;overflow-y:auto;min-width:160px;display:none;';
+  document.body.appendChild(drop);
+
+  function positionDrop(){
+    const r=input.getBoundingClientRect();
+    drop.style.left=r.left+'px';
+    drop.style.top=(r.bottom+4)+'px';
+    drop.style.width=r.width+'px';
+  }
+
+  function getCurrentWord(){
+    const val=input.value;
+    const lastComma=val.lastIndexOf(',');
+    return val.slice(lastComma+1).trim().toLowerCase();
+  }
+
+  function insertKw(kw){
+    const val=input.value;
+    const lastComma=val.lastIndexOf(',');
+    const before=lastComma>=0?val.slice(0,lastComma+1)+' ':'';
+    input.value=before+kw+', ';
+    drop.style.display='none';
+    input.focus();
+    // trigger oninput if present
+    input.dispatchEvent(new Event('input'));
+  }
+
+  function updateDrop(){
+    const word=getCurrentWord();
+    const all=getAllKeywords();
+    const matches=word.length>0?all.filter(k=>k.toLowerCase().startsWith(word)&&!input.value.split(',').map(s=>s.trim()).includes(k)):[];
+    if(!matches.length){ drop.style.display='none'; return; }
+    positionDrop();
+    drop.style.display='block';
+    drop.innerHTML=matches.map(k=>`<div style="padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--ink);border-radius:8px;" onmousedown="event.preventDefault()" onclick="void(0)">${k}</div>`).join('');
+    [...drop.children].forEach((el,i)=>{
+      el.addEventListener('mousedown',e=>{ e.preventDefault(); insertKw(matches[i]); });
+      el.addEventListener('mouseover',()=>el.style.background='#fff5f0');
+      el.addEventListener('mouseout',()=>el.style.background='');
+    });
+  }
+
+  input.addEventListener('input',updateDrop);
+  input.addEventListener('keydown',e=>{ if(e.key==='Escape') drop.style.display='none'; });
+  input.addEventListener('blur',()=>setTimeout(()=>drop.style.display='none',150));
+  input.addEventListener('focus',updateDrop);
+}
 function updateFileLabel(input,labelId){ const el=document.getElementById(labelId); if(!el) return; if(input.files&&input.files.length){ el.textContent=input.files.length>1?`已選 ${input.files.length} 張`:input.files[0].name; }else{ el.textContent='選擇圖片'; } }
 
 // ── MOBILE TAB BAR ──
