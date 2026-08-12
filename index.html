@@ -1630,8 +1630,10 @@ function renderBooksOverall(){
 function _drawForceGraph(){
   const el=document.getElementById('bookGridView'); if(!el||!window.d3) return;
   const d3=window.d3;
-  const W=el.offsetWidth||600;
-  const H=Math.max(460,Math.min(700,overallBooks.length*80));
+  // always measure fresh width so it responds to sidebar collapse
+  const W=el.getBoundingClientRect().width||600;
+  const nodeCount=overallBooks.length;
+  const H=Math.max(500,Math.min(800,nodeCount*100));
   el.innerHTML=`<svg id="bookForceGraph" width="${W}" height="${H}" style="display:block;overflow:visible;"></svg>`;
 
   const KW_COLORS=['#D9F7E6','#FDE0F0','#FFE3D1','#DCEEFD','#EDE3FF','#FFF1C2','#FFE0DC'];
@@ -1644,61 +1646,70 @@ function _drawForceGraph(){
   const links=[];
   overallBooks.forEach(b=>{ (b.keywords||[]).forEach(kw=>{ links.push({source:'kw:'+kw,target:b.fbKey||b.id}); }); });
 
+  // Pre-place nodes in a grid so they start spread out (avoids initial pile-up)
+  const cols=Math.ceil(Math.sqrt(nodes.length*1.6));
+  const cellW=W/cols; const cellH=H/Math.ceil(nodes.length/cols);
+  nodes.forEach((n,i)=>{
+    n.x=cellW*(i%cols)+cellW/2+(Math.random()-0.5)*cellW*0.3;
+    n.y=cellH*Math.floor(i/cols)+cellH/2+(Math.random()-0.5)*cellH*0.3;
+  });
+
+  const CIRCLE_R=32;
+
   const svg=d3.select('#bookForceGraph');
   const defs=svg.append('defs');
   bookNodes.forEach(n=>{
     defs.append('clipPath').attr('id','clip-'+n.id.replace(/[^a-zA-Z0-9]/g,'-'))
-      .append('circle').attr('r',28);
+      .append('circle').attr('r',CIRCLE_R-2);
   });
 
-  // Stronger separation: book r=42, kw r=50 (accounts for pill half-width)
+  // ── FORCE CONFIG ──
   const sim=d3.forceSimulation(nodes)
-    .force('link',d3.forceLink(links).id(d=>d.id).distance(120).strength(0.4))
-    .force('charge',d3.forceManyBody().strength(-280))
-    .force('center',d3.forceCenter(W/2,H/2))
-    .force('collision',d3.forceCollide().radius(d=>d.type==='kw'?52:44).strength(1).iterations(4))
+    .force('link',d3.forceLink(links).id(d=>d.id).distance(150).strength(0.25))
+    .force('charge',d3.forceManyBody().strength(d=>d.type==='kw'?-250:-350))
+    .force('center',d3.forceCenter(W/2,H/2).strength(0.06))
+    .force('collision',d3.forceCollide()
+      .radius(d=>d.type==='kw' ? Math.max(60, d.label.length*5+40) : 72)
+      .strength(1).iterations(8))
     .force('x',d3.forceX(W/2).strength(0.04))
     .force('y',d3.forceY(H/2).strength(0.04))
-    .alphaDecay(0.02); // slower decay = more time to resolve overlaps
+    .alphaDecay(0.018)
+    .velocityDecay(0.5); // heavy damping stops oscillation quickly
 
   const link=svg.append('g').selectAll('line').data(links).join('line')
-    .attr('stroke','#ddd').attr('stroke-width',1.5).attr('stroke-dasharray','4,3');
+    .attr('stroke','#e8e8e8').attr('stroke-width',1.5).attr('stroke-dasharray','5,4');
 
   const node=svg.append('g').selectAll('g').data(nodes).join('g')
     .attr('cursor','pointer')
     .call(d3.drag()
-      .on('start',(e,d)=>{ if(!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x;d.fy=d.y; })
+      .on('start',(e,d)=>{ if(!e.active) sim.alphaTarget(0.2).restart(); d.fx=d.x;d.fy=d.y; })
       .on('drag',(e,d)=>{ d.fx=e.x;d.fy=e.y; })
       .on('end',(e,d)=>{ if(!e.active) sim.alphaTarget(0); d.fx=null;d.fy=null; }));
 
   // ── KEYWORD PILL NODES ──
   node.filter(d=>d.type==='kw').each(function(d){
     const g=d3.select(this);
-    const pw=Math.max(60, d.label.length*9+28);
-    g.append('rect').attr('rx',14).attr('height',28).attr('width',pw)
-      .attr('x',-pw/2).attr('y',-14).attr('fill',d.color).attr('opacity',0.92)
-      .attr('stroke','rgba(0,0,0,0.08)').attr('stroke-width',1);
-    const txt=g.append('text').attr('text-anchor','middle').attr('dy','0.35em')
-      .attr('font-size','11px').attr('font-weight','700').attr('fill','#444')
+    const pw=Math.max(64, d.label.length*9+30);
+    g.append('rect').attr('rx',14).attr('height',30).attr('width',pw)
+      .attr('x',-pw/2).attr('y',-15).attr('fill',d.color).attr('opacity',0.95)
+      .attr('stroke','rgba(0,0,0,0.06)').attr('stroke-width',1.5);
+    g.append('text').attr('text-anchor','middle').attr('dy','0.35em')
+      .attr('font-family',"'Space Grotesk','Noto Sans TC',sans-serif")
+      .attr('font-size','11.5px').attr('font-weight','700').attr('fill','#3a3a3a')
       .text(d.label).attr('pointer-events','none');
 
-    // Click keyword to edit label inline
+    // Click to edit keyword inline
     g.on('click',(e)=>{
       e.stopPropagation();
       const oldKw=d.label;
-      // Show a small input overlay near the node
       const svgRect=document.getElementById('bookForceGraph').getBoundingClientRect();
-      const elRect=el.getBoundingClientRect();
       const input=document.createElement('input');
       input.value=oldKw;
-      input.style.cssText=`position:fixed;left:${svgRect.left+(d.x||W/2)-50}px;top:${svgRect.top+(d.y||H/2)-16}px;width:110px;font-size:12px;font-weight:700;padding:4px 10px;border:2px solid var(--orange);border-radius:20px;outline:none;z-index:3000;text-align:center;background:white;`;
-      document.body.appendChild(input);
-      input.focus(); input.select();
+      input.style.cssText=`position:fixed;left:${svgRect.left+(d.x||W/2)-55}px;top:${svgRect.top+(d.y||H/2)-16}px;width:120px;font-size:12px;font-weight:700;padding:5px 12px;border:2px solid var(--orange);border-radius:20px;outline:none;z-index:3000;text-align:center;background:white;box-shadow:0 4px 12px rgba(255,106,43,0.2);`;
+      document.body.appendChild(input); input.focus(); input.select();
       const finish=async()=>{
-        const newKw=input.value.trim();
-        input.remove();
+        const newKw=input.value.trim(); input.remove();
         if(!newKw||newKw===oldKw) return;
-        // Rename keyword in all books
         const affected=overallBooks.filter(b=>(b.keywords||[]).includes(oldKw));
         await Promise.all(affected.map(async b=>{
           b.keywords=b.keywords.map(k=>k===oldKw?newKw:k);
@@ -1706,47 +1717,93 @@ function _drawForceGraph(){
           try{ await fbSet(`books/${bid}`,{title:b.title,type:b.type,who:b.who,link:b.link,img:b.img||'',keywords:b.keywords}); }
           catch(e){ toastError('⚠️ 儲存失敗'); }
         }));
-        toast(`✓ 關鍵字「${oldKw}」→「${newKw}」`);
+        toast(`✓ 「${oldKw}」→「${newKw}」`);
         renderBooksOverall();
       };
-      input.addEventListener('keydown',e=>{ if(e.key==='Enter') finish(); if(e.key==='Escape'){ input.remove(); } });
+      input.addEventListener('keydown',e=>{ if(e.key==='Enter') finish(); if(e.key==='Escape') input.remove(); });
       input.addEventListener('blur',finish);
     });
   });
 
   // ── BOOK CIRCLE NODES ──
+  // Helper: wrap title into lines of ≤ charLimit chars
+  function wrapTitle(title, charLimit=10){
+    const words=title.split(/\s+/);
+    const lines=[]; let cur='';
+    for(const w of words){
+      if((cur+' '+w).trim().length<=charLimit) cur=(cur+' '+w).trim();
+      else { if(cur) lines.push(cur); cur=w; }
+    }
+    if(cur) lines.push(cur);
+    // If no spaces (Chinese), split by char count
+    if(lines.length===1 && title.length>charLimit){
+      return [title.slice(0,charLimit), title.slice(charLimit,charLimit*2)+(title.length>charLimit*2?'…':'')];
+    }
+    if(lines.length>2) lines.splice(2,lines.length-2,lines[2].slice(0,charLimit-1)+'…');
+    return lines.slice(0,2);
+  }
+
   node.filter(d=>d.type==='book').each(function(d){
     const g=d3.select(this);
     const b=d.book; const bid=b.fbKey||b.id;
     const clipId='clip-'+bid.replace(/[^a-zA-Z0-9]/g,'-');
-    g.append('circle').attr('r',30).attr('fill','#f5f5f6').attr('stroke','#e0e0e0').attr('stroke-width',2);
+
+    // Shadow for depth
+    g.append('circle').attr('r',CIRCLE_R+1).attr('fill','none')
+      .attr('stroke','rgba(0,0,0,0.06)').attr('stroke-width',4);
+    g.append('circle').attr('r',CIRCLE_R).attr('fill','#f7f7f8')
+      .attr('stroke','#e0e0e0').attr('stroke-width',2);
+
+    // Image
     const ytMatch=(b.link||'').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
     const imgSrc=b.img?b.img:ytMatch?`https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`
       :b.link?`https://api.microlink.io/?url=${encodeURIComponent(b.link)}&screenshot=false&meta=true&embed=image.url`:null;
     if(imgSrc){
-      g.append('image').attr('href',imgSrc).attr('x',-28).attr('y',-28).attr('width',56).attr('height',56)
+      g.append('image').attr('href',imgSrc)
+        .attr('x',-CIRCLE_R+2).attr('y',-CIRCLE_R+2)
+        .attr('width',(CIRCLE_R-2)*2).attr('height',(CIRCLE_R-2)*2)
         .attr('clip-path',`url(#${clipId})`).attr('preserveAspectRatio','xMidYMid slice');
     } else {
-      g.append('text').attr('text-anchor','middle').attr('dy','0.35em').attr('font-size','20px').text('📚');
+      g.append('text').attr('text-anchor','middle').attr('dy','0.35em').attr('font-size','22px').text('📚');
     }
-    g.append('text').attr('text-anchor','middle').attr('y',42)
-      .attr('font-size','10px').attr('font-weight','600').attr('fill','#555').attr('pointer-events','none')
-      .text(b.title.length>14?b.title.slice(0,13)+'…':b.title);
+
+    // Two-line title below circle
+    const titleLines=wrapTitle(b.title, 9);
+    titleLines.forEach((line,i)=>{
+      g.append('text')
+        .attr('text-anchor','middle')
+        .attr('y', CIRCLE_R+16+(i*14))
+        .attr('font-family',"'Space Grotesk','Noto Sans TC',sans-serif")
+        .attr('font-size','10px').attr('font-weight','600').attr('fill','#555')
+        .attr('pointer-events','none')
+        .text(line);
+    });
+
+    // Response badge
     const rc=(bookWalls[bid]||[]).length;
     if(rc){
-      g.append('circle').attr('cx',22).attr('cy',-22).attr('r',9).attr('fill','var(--orange)').attr('stroke','white').attr('stroke-width',2);
-      g.append('text').attr('x',22).attr('y',-22).attr('text-anchor','middle').attr('dy','0.35em')
+      g.append('circle').attr('cx',CIRCLE_R-6).attr('cy',-(CIRCLE_R-6)).attr('r',9)
+        .attr('fill','var(--orange)').attr('stroke','white').attr('stroke-width',2);
+      g.append('text').attr('x',CIRCLE_R-6).attr('y',-(CIRCLE_R-6))
+        .attr('text-anchor','middle').attr('dy','0.35em')
         .attr('font-size','8px').attr('font-weight','700').attr('fill','white').text(rc);
     }
-    g.on('mouseover',()=>g.select('circle').attr('stroke','var(--orange)').attr('stroke-width',2.5))
-     .on('mouseout',()=>g.select('circle').attr('stroke','#e0e0e0').attr('stroke-width',2))
+
+    g.on('mouseover',()=>g.selectAll('circle').filter((_,i)=>i===1).attr('stroke','var(--orange)').attr('stroke-width',2.5))
+     .on('mouseout',()=>g.selectAll('circle').filter((_,i)=>i===1).attr('stroke','#e0e0e0').attr('stroke-width',2))
      .on('click',()=>openBookModal(bid));
   });
 
+  // Clamp nodes within SVG bounds including title height
   sim.on('tick',()=>{
     link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y)
         .attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
-    node.attr('transform',d=>`translate(${Math.max(52,Math.min(W-52,d.x||W/2))},${Math.max(52,Math.min(H-56,d.y||H/2))})`);
+    node.attr('transform',d=>{
+      const pad=d.type==='kw'?50:CIRCLE_R+30;
+      const x=Math.max(pad,Math.min(W-pad,d.x||W/2));
+      const y=Math.max(pad,Math.min(H-CIRCLE_R-40,d.y||H/2));
+      return `translate(${x},${y})`;
+    });
   });
 }
 
@@ -2059,6 +2116,7 @@ function toggleRightCol(){
     const isCollapsed = col.classList.toggle('right-collapsed');
     btn.textContent = isCollapsed ? '‹' : '›';
     btn.title = isCollapsed ? '展開回應欄' : '收合回應欄';
+    if(!activeMonth && window.d3) setTimeout(()=>_drawForceGraph(), 320);
   }
 }
 
@@ -2070,6 +2128,7 @@ function toggleLeftCol(){
   const isCollapsed=col.classList.toggle('left-collapsed');
   btn.textContent=isCollapsed?'›':'‹';
   btn.title=isCollapsed?'展開側欄':'收合側欄';
+  if(!activeMonth && window.d3) setTimeout(()=>_drawForceGraph(), 320);
 }
 
 function toast(msg){ const el=document.getElementById('toast'); el.className='toast'; el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2200); }
